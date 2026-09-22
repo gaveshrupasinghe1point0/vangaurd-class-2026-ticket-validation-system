@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase-server';
 import Link from 'next/link';
 import { Plus, UserCheck, Clock, Search } from 'lucide-react';
 import type { Attendee } from '@/types';
+import ResetEntryButton from '@/components/ResetEntryButton';
 
 export default async function AttendeesPage({
   searchParams,
@@ -106,10 +107,13 @@ export default async function AttendeesPage({
                     </td>
                     <td className="px-6 py-4">
                       {a.qr_used ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
-                          <UserCheck size={12} />
-                          Checked In
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
+                            <UserCheck size={12} />
+                            Checked In
+                          </span>
+                          <ResetEntryButton attendeeId={a.id} iconOnly />
+                        </div>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-700/50 border border-zinc-700 text-zinc-400 text-xs font-medium">
                           <Clock size={12} />

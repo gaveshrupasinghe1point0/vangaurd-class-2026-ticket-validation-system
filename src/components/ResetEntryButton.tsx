@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-export default function ResetEntryButton({ attendeeId }: { attendeeId: string }) {
+export default function ResetEntryButton({ attendeeId, iconOnly }: { attendeeId: string, iconOnly?: boolean }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -26,6 +26,19 @@ export default function ResetEntryButton({ attendeeId }: { attendeeId: string })
     } finally {
       setLoading(false);
     }
+  }
+
+  if (iconOnly) {
+    return (
+      <button
+        onClick={handleReset}
+        disabled={loading}
+        title="Reset Entry"
+        className="p-1.5 rounded-full bg-zinc-800/50 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 border border-transparent hover:border-red-500/30 transition-all disabled:opacity-50"
+      >
+        <RotateCcw size={14} className={loading ? 'animate-spin' : ''} />
+      </button>
+    );
   }
 
   return (
