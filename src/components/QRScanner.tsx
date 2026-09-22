@@ -42,12 +42,16 @@ export default function QRScanner({ onScan, onError, fullscreen }: QRScannerProp
           (decodedText: string) => {
             if (hasScanned.current) return;
             hasScanned.current = true;
-            scanner
-              ?.stop()
-              .catch(() => {})
-              .finally(() => {
-                onScan(decodedText.trim());
-              });
+            try {
+              scanner
+                ?.stop()
+                .catch(() => {})
+                .finally(() => {
+                  onScan(decodedText.trim());
+                });
+            } catch (e) {
+              onScan(decodedText.trim());
+            }
           },
           () => {
             // Per-frame failures are normal — ignore
@@ -67,7 +71,13 @@ export default function QRScanner({ onScan, onError, fullscreen }: QRScannerProp
     initScanner();
 
     return () => {
-      scanner?.stop().catch(() => {});
+      try {
+        if (scannerRef.current) {
+          scannerRef.current.stop().catch(() => {});
+        }
+      } catch (e) {
+        // Ignore synchronous throws during unmount
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

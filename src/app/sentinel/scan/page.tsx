@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import QRScanner from '@/components/QRScanner';
 import type { ScanResult } from '@/types';
 import { CheckCircle2, XCircle, ScanLine, RotateCcw, ChevronRight } from 'lucide-react';
 
-export default function SentinelScanPage() {
+function SentinelScanContent() {
   const searchParams = useSearchParams();
   const [scanning, setScanning] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -243,6 +243,14 @@ export default function SentinelScanPage() {
         Camera permission required
       </p>
     </div>
+  );
+}
+
+export default function SentinelScanPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[100dvh] bg-[#09090b] flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-[#d4af37]/20 border-t-[#d4af37] animate-spin" /></div>}>
+      <SentinelScanContent />
+    </Suspense>
   );
 }
 
