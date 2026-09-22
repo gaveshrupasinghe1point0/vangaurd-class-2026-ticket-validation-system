@@ -1,11 +1,12 @@
-import { createClient } from '@/lib/supabase-server';
+import { createClient, createAdminClient } from '@/lib/supabase-server';
 import { FileText, Users, UserCheck, Clock, Download } from 'lucide-react';
 
 export default async function ReportsPage() {
   const supabase = await createClient();
+  const adminClient = createAdminClient();
 
   // All attendees with sentinel info joined
-  const { data: checkedIn } = await supabase
+  const { data: checkedIn } = await adminClient
     .from('attendees')
     .select(
       `id, full_name, nic, email, phone, qr_used_at,
@@ -14,7 +15,7 @@ export default async function ReportsPage() {
     .eq('qr_used', true)
     .order('qr_used_at', { ascending: true });
 
-  const { count: total } = await supabase
+  const { count: total } = await adminClient
     .from('attendees')
     .select('*', { count: 'exact', head: true });
 

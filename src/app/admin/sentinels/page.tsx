@@ -1,12 +1,13 @@
-import { createClient } from '@/lib/supabase-server';
+import { createAdminClient } from '@/lib/supabase-server';
 import Link from 'next/link';
 import { Plus, Shield } from 'lucide-react';
 import type { Profile } from '@/types';
 
 export default async function SentinelsPage() {
-  const supabase = await createClient();
+  // Use admin client to bypass RLS so we can see all profiles, not just our own
+  const supabaseAdmin = createAdminClient();
 
-  const { data: sentinels } = await supabase
+  const { data: sentinels } = await supabaseAdmin
     .from('profiles')
     .select('*')
     .eq('role', 'sentinel')

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase-server';
+import { createClient, createAdminClient } from '@/lib/supabase-server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, UserCheck, Clock } from 'lucide-react';
@@ -12,9 +12,9 @@ export default async function AttendeeDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
+  const adminClient = createAdminClient();
 
-  const { data: attendee } = await supabase
+  const { data: attendee } = await adminClient
     .from('attendees')
     .select(
       `*, scanned_by_profile:profiles!attendees_qr_used_by_fkey(full_name, email)`
