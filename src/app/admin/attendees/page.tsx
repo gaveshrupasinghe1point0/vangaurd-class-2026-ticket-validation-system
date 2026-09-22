@@ -80,13 +80,16 @@ export default async function AttendeesPage({
                   <th className="text-left px-6 py-4 text-zinc-500 text-xs font-medium uppercase tracking-wider">
                     Status
                   </th>
+                  <th className="text-right px-6 py-4 text-zinc-500 text-xs font-medium uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800">
                 {(attendees as Attendee[]).map((a) => (
                   <tr
                     key={a.id}
-                    className="hover:bg-zinc-800/50 transition-colors"
+                    className="hover:bg-zinc-800/50 transition-colors group"
                   >
                     <td className="px-6 py-4">
                       <Link
@@ -120,6 +123,14 @@ export default async function AttendeesPage({
                           Pending
                         </span>
                       )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <Link
+                        href={`/admin/attendees/${a.id}`}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-[#d4af37]/20 hover:text-[#d4af37] transition-all text-xs font-medium"
+                      >
+                        View QR
+                      </Link>
                     </td>
                   </tr>
                 ))}

@@ -1,21 +1,35 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import QRScanner from '@/components/QRScanner';
 import type { ScanResult } from '@/types';
 import { CheckCircle2, XCircle, ScanLine, RotateCcw, ChevronRight } from 'lucide-react';
 
 export default function SentinelScanPage() {
+  const searchParams = useSearchParams();
   const [scanning, setScanning] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [cameraError, setCameraError] = useState('');
 
   const handleScan = useCallback(
-    async (token: string) => {
+    async (scannedText: string) => {
       if (loading) return;
       setScanning(false);
       setLoading(true);
+
+      // If the QR code is a full URL, extract just the token part
+      let token = scannedText;
+      try {
+        if (scannedText.startsWith('http')) {
+          const url = new URL(scannedText);
+          const urlToken = url.searchParams.get('token');
+          if (urlToken) token = urlToken;
+        }
+      } catch (e) {
+        // Not a URL, use raw text
+      }
 
       try {
         const res = await fetch('/api/scan', {
@@ -37,10 +51,20 @@ export default function SentinelScanPage() {
     [loading]
   );
 
+  // Auto-scan if a token is in the URL (e.g. native camera opened the app)
+  useEffect(() => {
+    const urlToken = searchParams.get('token');
+    if (urlToken && !result && !loading) {
+      handleScan(urlToken);
+    }
+  }, [searchParams, handleScan, result, loading]);
+
   function reset() {
     setResult(null);
     setScanning(false);
     setCameraError('');
+    // Clear URL without reloading page
+    window.history.replaceState({}, '', '/sentinel/scan');
   }
 
   /* ── LOADING ─────────────────────────────────────── */

@@ -14,7 +14,10 @@ export default function QRDisplay({ token, attendeeName, isUsed }: QRDisplayProp
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
 
   useEffect(() => {
-    QRCode.toDataURL(token, {
+    // Generate a full URL so native iPhone cameras can scan and open it directly
+    const scanUrl = `${window.location.origin}/sentinel/scan?token=${token}`;
+
+    QRCode.toDataURL(scanUrl, {
       errorCorrectionLevel: 'H',
       margin: 2,
       width: 320,
