@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, UserCheck, Clock } from 'lucide-react';
 import type { Attendee } from '@/types';
 import QRDisplay from '@/components/QRDisplay';
+import ResetEntryButton from '@/components/ResetEntryButton';
 
 export default async function AttendeeDetailPage({
   params,
@@ -119,6 +120,11 @@ export default async function AttendeeDetailPage({
                     </span>
                   </div>
                 )}
+              </div>
+              
+              {/* Reset Entry Status */}
+              <div className="mt-4 pt-4 border-t border-green-500/10">
+                <ResetEntryButton attendeeId={a.id} />
               </div>
             </div>
           )}

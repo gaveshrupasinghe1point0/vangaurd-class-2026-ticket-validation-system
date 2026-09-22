@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   X,
+  FileText
 } from 'lucide-react';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase';
@@ -17,6 +18,7 @@ const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/attendees', label: 'Attendees', icon: Users },
   { href: '/admin/sentinels', label: 'Sentinels', icon: Shield },
+  { href: '/admin/reports', label: 'Reports', icon: FileText },
 ];
 
 export default function Sidebar() {
