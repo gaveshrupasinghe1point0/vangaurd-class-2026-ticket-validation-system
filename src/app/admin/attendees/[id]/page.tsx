@@ -5,6 +5,7 @@ import { ArrowLeft, UserCheck, Clock } from 'lucide-react';
 import type { Attendee } from '@/types';
 import QRDisplay from '@/components/QRDisplay';
 import ResetEntryButton from '@/components/ResetEntryButton';
+import DeleteAttendeeButton from '@/components/DeleteAttendeeButton';
 
 export default async function AttendeeDetailPage({
   params,
@@ -128,6 +129,17 @@ export default async function AttendeeDetailPage({
               </div>
             </div>
           )}
+
+          {/* Danger Zone */}
+          <div className="bg-red-950/20 border border-red-500/20 rounded-2xl p-6 mt-6">
+            <h2 className="text-red-400 font-semibold text-sm mb-2 uppercase tracking-wider">
+              Danger Zone
+            </h2>
+            <p className="text-zinc-500 text-xs leading-relaxed mb-4">
+              Permanently delete this attendee. Their QR code will immediately become invalid and they will not be able to enter the event. This action cannot be undone.
+            </p>
+            <DeleteAttendeeButton attendeeId={a.id} attendeeName={a.full_name} />
+          </div>
         </div>
 
         {/* Right — QR code */}
