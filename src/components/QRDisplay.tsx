@@ -62,16 +62,6 @@ export default function QRDisplay({ token, attendeeName, isUsed }: QRDisplayProp
         )}
       </div>
 
-      {/* Token preview */}
-      <div className="w-full px-3 py-2 bg-zinc-800 rounded-lg">
-        <p className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">
-          Token
-        </p>
-        <p className="text-zinc-400 text-[10px] font-mono break-all leading-relaxed">
-          {token}
-        </p>
-      </div>
-
       {/* Download button */}
       {!isUsed && (
         <button

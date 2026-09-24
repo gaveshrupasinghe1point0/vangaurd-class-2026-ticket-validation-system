@@ -44,7 +44,6 @@ export default async function PublicTicketPage({
           <h2 className="text-2xl font-bold text-white truncate px-4">
             {attendee.full_name}
           </h2>
-          <p className="text-zinc-500 text-sm mt-1">NIC: {attendee.nic}</p>
         </div>
 
         {/* QR Code Section */}
@@ -66,19 +65,27 @@ export default async function PublicTicketPage({
             <ul className="space-y-3 text-sm text-zinc-400">
               <li className="flex items-start gap-2.5">
                 <span className="shrink-0 mt-0.5 text-zinc-300">🔒</span>
-                <span><strong className="text-white">Unique Code:</strong> This QR is tied to your NIC. Do not share it. It can only be scanned once.</span>
+                <span><strong className="text-white">QR Code is Personal:</strong> Do not share it. It can only be scanned once.</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <span className="shrink-0 mt-0.5 text-zinc-300">🎟️</span>
-                <span><strong className="text-white">Digital Only:</strong> No physical tickets will be provided at the entrance.</span>
+                <span><strong className="text-white">Digital Only:</strong> No physical tickets. This digital QR code is the only form of entry.</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="shrink-0 mt-0.5 text-zinc-300">🚭</span>
+                <span><strong className="text-white">No Smoking:</strong> Smoking is strictly prohibited inside the hall.</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="shrink-0 mt-0.5 text-zinc-300">⛔</span>
+                <span><strong className="text-white">No Illegal Substances:</strong> Zero tolerance for illegal substances on the premises.</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="shrink-0 mt-0.5 text-zinc-300">💸</span>
+                <span><strong className="text-white">Damage Policy:</strong> If you break anything, you are responsible for the cost.</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <span className="shrink-0 mt-0.5 text-zinc-300">🪪</span>
-                <span><strong className="text-white">ID Required:</strong> Present your NIC along with this QR code at the gate.</span>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <span className="shrink-0 mt-0.5 text-zinc-300">📸</span>
-                <span><strong className="text-white">Screenshot:</strong> We recommend taking a screenshot of this ticket in case of bad internet connection.</span>
+                <span><strong className="text-white">ID Required:</strong> Present your NIC along with this QR code at the entrance.</span>
               </li>
             </ul>
           </div>
