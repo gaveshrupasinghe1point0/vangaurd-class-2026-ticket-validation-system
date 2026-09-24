@@ -110,8 +110,9 @@ export async function POST(request: Request) {
       await resend.emails.send({
         from: 'Vanguard 2026 Tickets <tickets@gaveshrupasinghe.online>',
         to: email.trim().toLowerCase(),
-        subject: 'Your Vanguard 2026 Ticket & QR Code',
+        subject: `Vanguard 2026 — Ticket Confirmation for ${full_name.trim()}`,
         html: emailHtml,
+        text: `Hi ${full_name.trim()},\n\nYour ticket for Vanguard 2026 has been confirmed. Your QR code is attached to this email as an image file.\n\nInstructions:\n- Save the attached QR code image to your phone before arriving.\n- Have your QR code and NIC ready at the entrance.\n- This QR code is unique to you and can only be scanned once. Do not share it.\n\nSee you at the event!\n\nVanguard 2026 Team`,
         attachments: [
           {
             filename: `vanguard-ticket-${full_name.trim().replace(/\s+/g, '-')}.png`,
