@@ -55,6 +55,33 @@ export default async function PublicTicketPage({
           />
         </div>
 
+        {/* Event Details */}
+        <div className="px-6 pb-6">
+          <div className="bg-[#d4af37]/10 rounded-xl p-5 border border-[#d4af37]/20">
+            <h3 className="text-[#d4af37] text-xs font-bold uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
+              🗓️ Event Details
+            </h3>
+            <div className="grid grid-cols-2 gap-y-4 gap-x-2 text-sm">
+              <div>
+                <p className="text-[#d4af37]/70 text-[10px] uppercase tracking-wider mb-0.5">Date</p>
+                <p className="text-white font-medium">24th Oct 2026</p>
+              </div>
+              <div>
+                <p className="text-[#d4af37]/70 text-[10px] uppercase tracking-wider mb-0.5">Time</p>
+                <p className="text-white font-medium">6:00 PM — 11:00 PM</p>
+              </div>
+              <div>
+                <p className="text-[#d4af37]/70 text-[10px] uppercase tracking-wider mb-0.5">Venue</p>
+                <p className="text-white font-medium">Oak Ray Gatambe</p>
+              </div>
+              <div>
+                <p className="text-[#d4af37]/70 text-[10px] uppercase tracking-wider mb-0.5">Dress Code</p>
+                <p className="text-white font-medium">Full Black</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Instructions */}
         <div className="px-6 pb-8">
           <div className="bg-black/50 rounded-xl p-5 border border-zinc-800/50">
