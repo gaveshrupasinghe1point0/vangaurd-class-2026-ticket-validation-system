@@ -40,8 +40,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
   }
 
-  // Use admin client to bypass RLS for insert
   const adminClient = createAdminClient();
+
+  // Check if an attendee with this NIC already exists
+  const { data: existingAttendee } = await adminClient
+    .from('attendees')
+    .select('id, full_name')
+    .eq('nic', nic.trim())
+    .single();
+
+  if (existingAttendee) {
+    return NextResponse.json(
+      { error: `This NIC is already registered to: ${existingAttendee.full_name}` }, 
+      { status: 409 }
+    );
+  }
+
   const qr_token = crypto.randomUUID();
 
   const { data, error } = await adminClient
