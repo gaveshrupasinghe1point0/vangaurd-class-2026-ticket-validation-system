@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase-server';
-import { Users, UserCheck, Clock, Shield } from 'lucide-react';
+import { Users, UserCheck, Clock, Shield, Wallet } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function DashboardPage() {
@@ -22,6 +22,7 @@ export default async function DashboardPage() {
   ]);
 
   const pending = (totalAttendees ?? 0) - (checkedIn ?? 0);
+  const totalIncome = (totalAttendees ?? 0) * 6500;
 
   const stats = [
     {
@@ -47,6 +48,14 @@ export default async function DashboardPage() {
       color: 'text-blue-400',
       bg: 'bg-blue-500/10',
       border: 'border-blue-500/20',
+    },
+    {
+      label: 'Total Income',
+      value: `LKR ${totalIncome.toLocaleString()}`,
+      icon: Wallet,
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-500/10',
+      border: 'border-emerald-500/20',
     },
     {
       label: 'Sentinels',
@@ -77,17 +86,19 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         {stats.map(({ label, value, icon: Icon, color, bg, border }) => (
           <div
             key={label}
-            className={`rounded-2xl border ${border} ${bg} p-5`}
+            className={`rounded-2xl border ${border} ${bg} p-5 flex flex-col justify-between`}
           >
             <div className={`${color} mb-3`}>
               <Icon size={22} />
             </div>
-            <div className="text-3xl font-black text-white">{value}</div>
-            <div className="text-zinc-500 text-sm mt-1">{label}</div>
+            <div>
+              <div className="text-2xl xl:text-3xl font-black text-white truncate">{value}</div>
+              <div className="text-zinc-500 text-sm mt-1">{label}</div>
+            </div>
           </div>
         ))}
       </div>
