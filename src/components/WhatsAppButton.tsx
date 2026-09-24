@@ -3,36 +3,18 @@
 export default function WhatsAppButton({
   phone,
   name,
+  token,
   iconOnly,
 }: {
   phone: string;
   name: string;
+  token: string;
   iconOnly?: boolean;
 }) {
   function buildMessage() {
+    const ticketUrl = `https://t-validati.vercel.app/api/ticket/${token}`;
     return encodeURIComponent(
-      `Hi ${name} 👋,
-
-Your ticket for *Vanguard 2026* is confirmed! 🎉
-
-📅 *EVENT DETAILS*
-• Date: 24th October 2026
-• Time: 6:00 PM — 11:00 PM
-• Venue: Oak Ray Gatambe
-• Dress Code: Full Black, Smart Casual
-
-📋 *GROUND RULES*
-🔒 Your QR code is personal — do not share it. It can only be scanned once.
-🎟 No physical tickets — digital QR code is the only form of entry.
-🚭 No smoking inside the hall.
-⛔ No illegal substances on the premises.
-💸 If you break anything, you are responsible for the cost.
-🪪 Have your NIC ready at the entrance.
-
-Your QR code ticket has been sent to your email. Please save it to your phone before arriving.
-
-See you on the night! 🖤
-*Vanguard 2026 Team*`
+      `Hi ${name},\n\nYour ticket for *Vanguard 2026* is confirmed!\n\n*YOUR TICKET LINK:*\n${ticketUrl}\n\n*EVENT DETAILS*\n- Date: 24th October 2026\n- Time: 6:00 PM - 11:00 PM\n- Venue: Oak Ray Gatambe\n- Dress Code: Full Black, Smart Casual\n\n*GROUND RULES*\n- Your QR code is personal - do not share it. It can only be scanned once.\n- No physical tickets - digital QR code is the only form of entry.\n- No smoking inside the hall.\n- No illegal substances on the premises.\n- If you break anything, you are responsible for the cost.\n- Have your NIC ready at the entrance.\n\nSee you on the night!\n*Vanguard 2026 Team*`
     );
   }
 

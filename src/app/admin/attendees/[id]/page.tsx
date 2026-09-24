@@ -154,7 +154,7 @@ export default async function AttendeeDetailPage({
               attendeeName={a.full_name}
               isUsed={a.qr_used}
             />
-            <WhatsAppButton phone={a.phone} name={a.full_name} />
+            <WhatsAppButton phone={a.phone} name={a.full_name} token={a.qr_token} />
             <p className="text-zinc-600 text-xs text-center mt-2 leading-relaxed">
               Send this QR code to the attendee via WhatsApp or email. Each
               code can only be scanned once.
