@@ -79,40 +79,99 @@ export async function POST(request: Request) {
 
       // Build the email HTML
       const emailHtml = `
-        <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; background: #09090b; color: #ffffff; padding: 40px 20px; border-radius: 12px; border: 1px solid #333;">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #d4af37; letter-spacing: 0.15em; font-size: 24px; text-transform: uppercase; margin: 0;">Vanguard 2026</h1>
-            <p style="color: #888; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 5px;">Your Official Ticket</p>
-          </div>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #09090b; color: #ffffff; padding: 40px 20px; border-radius: 12px; border: 1px solid #2a2a2a;">
           
-          <div style="background: #18181b; padding: 25px; border-radius: 8px; border: 1px solid #333; margin-bottom: 30px;">
-            <h2 style="margin-top: 0; color: #fff; font-size: 18px;">Hi ${full_name.trim()},</h2>
-            <p style="color: #ccc; line-height: 1.6; font-size: 15px;">
-              You have been officially added to the guest list for Vanguard 2026. Your exclusive QR code ticket is attached to this email.
+          <!-- Header -->
+          <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #2a2a2a; padding-bottom: 24px;">
+            <h1 style="color: #d4af37; letter-spacing: 0.2em; font-size: 28px; text-transform: uppercase; margin: 0 0 6px 0;">VANGUARD</h1>
+            <div style="color: #d4af37; font-size: 18px; letter-spacing: 0.15em; font-weight: bold;">2026</div>
+            <p style="color: #666; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; margin: 8px 0 0 0;">Official Entry Ticket</p>
+          </div>
+
+          <!-- Greeting -->
+          <div style="margin-bottom: 28px;">
+            <h2 style="color: #fff; font-size: 18px; margin: 0 0 10px 0;">Hi ${full_name.trim()} 👋</h2>
+            <p style="color: #aaa; line-height: 1.7; font-size: 15px; margin: 0;">
+              You're officially on the guest list for <strong style="color: #d4af37;">Vanguard 2026</strong>. Your personal QR code ticket is attached to this email as an image. Save it to your phone — you'll need it to get in.
             </p>
-            
-            <div style="margin-top: 25px;">
-              <h3 style="color: #d4af37; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;">Event Instructions:</h3>
-              <ul style="color: #ccc; line-height: 1.6; font-size: 14px; padding-left: 20px;">
-                <li style="margin-bottom: 8px;"><strong>Save your ticket:</strong> Please download the attached QR code image to your phone before arriving.</li>
-                <li style="margin-bottom: 8px;"><strong>Entry:</strong> Have your QR code and NIC ready at the entrance.</li>
-                <li><strong>Security:</strong> This QR code is unique to you and can only be scanned once. Do not share it with anyone.</li>
-              </ul>
-            </div>
           </div>
-          
-          <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #666; font-size: 12px; letter-spacing: 0.05em;">VANGUARD 2026 TEAM</p>
+
+          <!-- Section 1: Event Details -->
+          <div style="background: #111113; border: 1px solid #2a2a2a; border-radius: 10px; padding: 22px; margin-bottom: 20px;">
+            <h3 style="color: #d4af37; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 16px 0; border-bottom: 1px solid #2a2a2a; padding-bottom: 10px;">🗓 Event Info</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 0 2px 0; width: 100px;">Date</td>
+                <td style="color: #fff; font-size: 14px; font-weight: bold; padding: 8px 0 2px 0;">24th October 2026</td>
+              </tr>
+              <tr>
+                <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 0;">Time</td>
+                <td style="color: #fff; font-size: 14px; font-weight: bold; padding: 4px 0;">6:00 PM — 11:00 PM</td>
+              </tr>
+              <tr>
+                <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 0;">Venue</td>
+                <td style="color: #fff; font-size: 14px; font-weight: bold; padding: 4px 0;">Oak Ray Gatambe</td>
+              </tr>
+              <tr>
+                <td style="color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 0;">Dress Code</td>
+                <td style="color: #fff; font-size: 14px; font-weight: bold; padding: 4px 0;">Full Black — Smart Casual</td>
+              </tr>
+            </table>
           </div>
+
+          <!-- Section 2: Ground Rules -->
+          <div style="background: #111113; border: 1px solid #2a2a2a; border-radius: 10px; padding: 22px; margin-bottom: 28px;">
+            <h3 style="color: #d4af37; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 16px 0; border-bottom: 1px solid #2a2a2a; padding-bottom: 10px;">📋 Ground Rules</h3>
+            <ul style="color: #bbb; font-size: 14px; line-height: 1.8; padding-left: 18px; margin: 0;">
+              <li style="margin-bottom: 8px;"><strong style="color: #fff;">Your QR code is unique to you</strong> — do not share it with anyone. Each code can only be scanned once at entry.</li>
+              <li style="margin-bottom: 8px;"><strong style="color: #fff;">No physical tickets</strong> — digital QR code is the only accepted form of entry. No exceptions.</li>
+              <li style="margin-bottom: 8px;"><strong style="color: #fff;">No smoking</strong> inside the hall at any time.</li>
+              <li style="margin-bottom: 8px;"><strong style="color: #fff;">No illegal substances</strong> of any kind are permitted on the premises.</li>
+              <li style="margin-bottom: 8px;"><strong style="color: #fff;">Damage policy</strong> — if you break anything, you are responsible for the cost of replacement.</li>
+              <li><strong style="color: #fff;">Have your NIC ready</strong> along with your QR code at the entrance for verification.</li>
+            </ul>
+          </div>
+
+          <!-- Footer -->
+          <div style="text-align: center; border-top: 1px solid #2a2a2a; padding-top: 20px;">
+            <p style="color: #d4af37; font-size: 13px; letter-spacing: 0.1em; margin: 0 0 6px 0; font-weight: bold;">SEE YOU THERE 🖤</p>
+            <p style="color: #444; font-size: 11px; letter-spacing: 0.05em; margin: 0;">VANGUARD 2026 TEAM</p>
+          </div>
+
         </div>
       `;
+
+      const emailText = `Hi ${full_name.trim()},
+
+You're officially on the guest list for Vanguard 2026. Your QR code ticket is attached to this email as an image. Save it to your phone before arriving.
+
+━━━━━━━━━━━━━━━━━━━━━━
+EVENT INFO
+━━━━━━━━━━━━━━━━━━━━━━
+Date     : 24th October 2026
+Time     : 6:00 PM — 11:00 PM
+Venue    : Oak Ray Gatambe
+Dress Code: Full Black — Smart Casual
+
+━━━━━━━━━━━━━━━━━━━━━━
+GROUND RULES
+━━━━━━━━━━━━━━━━━━━━━━
+• Your QR code is unique to you — do not share it. It can only be scanned once.
+• No physical tickets — digital QR code is the only accepted form of entry.
+• No smoking inside the hall at any time.
+• No illegal substances of any kind are permitted.
+• Damage policy — if you break anything, you are responsible for the cost.
+• Have your NIC ready along with your QR code at the entrance.
+
+See you there 🖤
+Vanguard 2026 Team`;
 
       await resend.emails.send({
         from: 'Vanguard 2026 Tickets <tickets@gaveshrupasinghe.online>',
         to: email.trim().toLowerCase(),
         subject: `Vanguard 2026 — Ticket Confirmation for ${full_name.trim()}`,
         html: emailHtml,
-        text: `Hi ${full_name.trim()},\n\nYour ticket for Vanguard 2026 has been confirmed. Your QR code is attached to this email as an image file.\n\nInstructions:\n- Save the attached QR code image to your phone before arriving.\n- Have your QR code and NIC ready at the entrance.\n- This QR code is unique to you and can only be scanned once. Do not share it.\n\nSee you at the event!\n\nVanguard 2026 Team`,
+        text: emailText,
         attachments: [
           {
             filename: `vanguard-ticket-${full_name.trim().replace(/\s+/g, '-')}.png`,
