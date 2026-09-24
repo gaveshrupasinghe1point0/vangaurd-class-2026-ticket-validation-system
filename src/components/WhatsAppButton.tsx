@@ -12,7 +12,10 @@ export default function WhatsAppButton({
   iconOnly?: boolean;
 }) {
   function buildMessage() {
-    const ticketUrl = `https://t-validati.vercel.app/api/ticket/${token}`;
+    // Get the actual domain we're running on (works for localhost, vercel, or custom domain)
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://gaveshrupasinghe.online';
+    const ticketUrl = `${origin}/api/ticket/${token}`;
+    
     return encodeURIComponent(
       `Hi ${name},\n\nYour ticket for *Vanguard 2026* is confirmed!\n\n*YOUR TICKET LINK:*\n${ticketUrl}\n\n*EVENT DETAILS*\n- Date: 24th October 2026\n- Time: 6:00 PM - 11:00 PM\n- Venue: Oak Ray Gatambe\n- Dress Code: Full Black, Smart Casual\n\n*GROUND RULES*\n- Your QR code is personal - do not share it. It can only be scanned once.\n- No physical tickets - digital QR code is the only form of entry.\n- No smoking inside the hall.\n- No illegal substances on the premises.\n- If you break anything, you are responsible for the cost.\n- Have your NIC ready at the entrance.\n\nSee you on the night!\n*Vanguard 2026 Team*`
     );

@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 
   // === EMAIL SENDING LOGIC ===
   try {
-    const origin = request.headers.get('origin') || 'https://t-validati.vercel.app';
+    const origin = request.headers.get('origin') || 'https://gaveshrupasinghe.online';
     const scanUrl = `${origin}/sentinel/scan?token=${qr_token}`;
 
     const qrDataUrl = await QRCode.toDataURL(scanUrl, {

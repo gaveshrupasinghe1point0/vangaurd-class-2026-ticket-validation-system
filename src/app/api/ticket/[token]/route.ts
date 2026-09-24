@@ -9,7 +9,7 @@ export async function GET(
     const { token } = await context.params;
     if (!token) return new NextResponse('Missing token', { status: 400 });
 
-    const host = request.headers.get('host') || 't-validati.vercel.app';
+    const host = request.headers.get('host') || 'gaveshrupasinghe.online';
     const protocol = host.includes('localhost') ? 'http' : 'https';
     
     // The URL that the scanner needs to read when they scan the QR code
