@@ -4,6 +4,7 @@ import { Plus, UserCheck, Clock, Search } from 'lucide-react';
 import type { Attendee } from '@/types';
 import ResetEntryButton from '@/components/ResetEntryButton';
 import DeleteAttendeeButton from '@/components/DeleteAttendeeButton';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 export default async function AttendeesPage({
   searchParams,
@@ -127,6 +128,7 @@ export default async function AttendeesPage({
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <WhatsAppButton phone={a.phone} name={a.full_name} iconOnly />
                         <Link
                           href={`/admin/attendees/${a.id}`}
                           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:bg-[#d4af37]/20 hover:text-[#d4af37] transition-all text-xs font-medium"

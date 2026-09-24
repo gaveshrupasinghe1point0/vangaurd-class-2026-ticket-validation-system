@@ -6,6 +6,7 @@ import type { Attendee } from '@/types';
 import QRDisplay from '@/components/QRDisplay';
 import ResetEntryButton from '@/components/ResetEntryButton';
 import DeleteAttendeeButton from '@/components/DeleteAttendeeButton';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 export default async function AttendeeDetailPage({
   params,
@@ -153,7 +154,8 @@ export default async function AttendeeDetailPage({
               attendeeName={a.full_name}
               isUsed={a.qr_used}
             />
-            <p className="text-zinc-600 text-xs text-center mt-4 leading-relaxed">
+            <WhatsAppButton phone={a.phone} name={a.full_name} />
+            <p className="text-zinc-600 text-xs text-center mt-2 leading-relaxed">
               Send this QR code to the attendee via WhatsApp or email. Each
               code can only be scanned once.
             </p>

@@ -1,6 +1,6 @@
 import { createClient, createAdminClient } from '@/lib/supabase-server';
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import QRCode from 'qrcode';
 
 export async function GET() {
@@ -61,14 +61,6 @@ export async function POST(request: Request) {
 
   // === EMAIL SENDING LOGIC ===
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-      },
-    });
-
     const origin = request.headers.get('origin') || 'https://t-validati.vercel.app';
     const scanUrl = `${origin}/sentinel/scan?token=${qr_token}`;
 
@@ -202,8 +194,10 @@ GROUND RULES
 See you there.
 Vanguard 2026 Team`;
 
-    await transporter.sendMail({
-      from: `"Vanguard2026" <${process.env.GMAIL_USER}>`,
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    await resend.emails.send({
+      from: 'Vanguard 2026 <tickets@gaveshrupasinghe.online>',
       to: email.trim().toLowerCase(),
       subject: `Vanguard 2026 Ticket - ${full_name.trim()}`,
       html: emailHtml,
@@ -211,8 +205,7 @@ Vanguard 2026 Team`;
       attachments: [
         {
           filename: 'vanguard-2026-ticket.png',
-          content: Buffer.from(base64Image, 'base64'),
-          contentType: 'image/png',
+          content: base64Image,
         },
       ],
     });
