@@ -1,6 +1,6 @@
 import { createClient, createAdminClient } from '@/lib/supabase-server';
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import QRCode from 'qrcode';
 
 export async function GET() {
@@ -61,23 +61,26 @@ export async function POST(request: Request) {
 
   // === EMAIL SENDING LOGIC ===
   try {
-    if (process.env.RESEND_API_KEY) {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      
-      // Determine origin for the scan URL (fallback if request header missing)
-      const origin = request.headers.get('origin') || 'https://t-validati.vercel.app';
-      const scanUrl = `${origin}/sentinel/scan?token=${qr_token}`;
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    });
 
-      // Generate the QR code as a base64 image
-      const qrDataUrl = await QRCode.toDataURL(scanUrl, {
-        errorCorrectionLevel: 'H',
-        margin: 2,
-        width: 400,
-        color: { dark: '#000000', light: '#ffffff' },
-      });
-      const base64Image = qrDataUrl.split(',')[1];
+    const origin = request.headers.get('origin') || 'https://t-validati.vercel.app';
+    const scanUrl = `${origin}/sentinel/scan?token=${qr_token}`;
 
-      const plainText = `Hi ${full_name.trim()},
+    const qrDataUrl = await QRCode.toDataURL(scanUrl, {
+      errorCorrectionLevel: 'H',
+      margin: 2,
+      width: 400,
+      color: { dark: '#000000', light: '#ffffff' },
+    });
+    const base64Image = qrDataUrl.split(',')[1];
+
+    const plainText = `Hi ${full_name.trim()},
 
 Your ticket for Vanguard 2026 is confirmed. Your QR code is attached to this email. Save it to your phone and present it at the entrance.
 
@@ -98,22 +101,21 @@ GROUND RULES
 See you there.
 Vanguard 2026 Team`;
 
-      await resend.emails.send({
-        from: 'Vanguard 2026 <tickets@gaveshrupasinghe.online>',
-        to: email.trim().toLowerCase(),
-        subject: `Vanguard 2026 Ticket - ${full_name.trim()}`,
-        text: plainText,
-        attachments: [
-          {
-            filename: `vanguard-2026-ticket.png`,
-            content: base64Image,
-          },
-        ],
-      });
-    }
+    await transporter.sendMail({
+      from: `"Vanguard2026" <${process.env.GMAIL_USER}>`,
+      to: email.trim().toLowerCase(),
+      subject: `Vanguard 2026 Ticket - ${full_name.trim()}`,
+      text: plainText,
+      attachments: [
+        {
+          filename: 'vanguard-2026-ticket.png',
+          content: Buffer.from(base64Image, 'base64'),
+          contentType: 'image/png',
+        },
+      ],
+    });
   } catch (emailErr) {
     console.error('Failed to send email:', emailErr);
-    // We do not return 500 here because the attendee was successfully created
   }
 
   return NextResponse.json(data, { status: 201 });
