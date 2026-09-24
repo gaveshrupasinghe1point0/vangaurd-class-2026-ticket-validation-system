@@ -3,10 +3,10 @@ import QRCode from 'qrcode';
 
 export async function GET(
   request: Request,
-  { params }: { params: { token: string } }
+  context: { params: Promise<{ token: string }> }
 ) {
   try {
-    const token = params.token;
+    const { token } = await context.params;
     if (!token) return new NextResponse('Missing token', { status: 400 });
 
     const host = request.headers.get('host') || 't-validati.vercel.app';
@@ -23,7 +23,10 @@ export async function GET(
       color: { dark: '#000000', light: '#ffffff' },
     });
 
-    return new NextResponse(qrBuffer, {
+    // Convert to web standard array for Next.js Response
+    const body = new Uint8Array(qrBuffer);
+
+    return new NextResponse(body, {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=31536000, immutable',
