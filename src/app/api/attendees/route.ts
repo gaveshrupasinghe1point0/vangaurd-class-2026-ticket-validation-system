@@ -108,7 +108,7 @@ export async function POST(request: Request) {
       `;
 
       await resend.emails.send({
-        from: 'Vanguard 2026 Tickets <onboarding@resend.dev>',
+        from: 'Vanguard 2026 Tickets <tickets@gaveshrupasinghe.online>',
         to: email.trim().toLowerCase(),
         subject: 'Your Vanguard 2026 Ticket & QR Code',
         html: emailHtml,
