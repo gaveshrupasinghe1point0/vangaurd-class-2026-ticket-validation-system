@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+
 export default function WhatsAppButton({
   phone,
   name,
@@ -11,9 +13,13 @@ export default function WhatsAppButton({
   token: string;
   iconOnly?: boolean;
 }) {
+  const [origin, setOrigin] = useState('https://gaveshrupasinghe.online');
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
   function buildMessage() {
-    // Get the actual domain we're running on (works for localhost, vercel, or custom domain)
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://gaveshrupasinghe.online';
     const ticketUrl = `${origin}/ticket/${token}`;
     
     return encodeURIComponent(

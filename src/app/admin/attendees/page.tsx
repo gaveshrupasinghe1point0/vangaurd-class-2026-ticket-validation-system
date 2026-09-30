@@ -5,6 +5,7 @@ import type { Attendee } from '@/types';
 import ResetEntryButton from '@/components/ResetEntryButton';
 import DeleteAttendeeButton from '@/components/DeleteAttendeeButton';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import PaymentStatusBadge from '@/components/PaymentStatusBadge';
 
 export default async function AttendeesPage({
   searchParams,
@@ -111,20 +112,26 @@ export default async function AttendeesPage({
                       {a.phone}
                     </td>
                     <td className="px-6 py-4">
-                      {a.qr_used ? (
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
-                            <UserCheck size={12} />
-                            Checked In
+                      <div className="flex flex-col items-start gap-2">
+                        {/* Payment Status */}
+                        {a.payment_status && <PaymentStatusBadge status={a.payment_status} />}
+                        
+                        {/* Entry Status */}
+                        {a.qr_used ? (
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-[10px] font-medium uppercase tracking-wider">
+                              <UserCheck size={10} />
+                              Checked In
+                            </span>
+                            <ResetEntryButton attendeeId={a.id} iconOnly />
+                          </div>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-700/50 border border-zinc-700 text-zinc-400 text-[10px] font-medium uppercase tracking-wider">
+                            <Clock size={10} />
+                            Not Entered
                           </span>
-                          <ResetEntryButton attendeeId={a.id} iconOnly />
-                        </div>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-700/50 border border-zinc-700 text-zinc-400 text-xs font-medium">
-                          <Clock size={12} />
-                          Pending
-                        </span>
-                      )}
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">

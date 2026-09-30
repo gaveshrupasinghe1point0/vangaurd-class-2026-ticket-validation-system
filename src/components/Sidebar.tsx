@@ -9,7 +9,8 @@ import {
   LogOut,
   Menu,
   X,
-  FileText
+  FileText,
+  Wallet,
 } from 'lucide-react';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase';
@@ -17,6 +18,7 @@ import { createClient } from '@/lib/supabase';
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/attendees', label: 'Attendees', icon: Users },
+  { href: '/admin/payments', label: 'Payments', icon: Wallet },
   { href: '/admin/sentinels', label: 'Sentinels', icon: Shield },
   { href: '/admin/reports', label: 'Reports', icon: FileText },
 ];
