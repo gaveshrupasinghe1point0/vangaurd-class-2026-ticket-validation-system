@@ -24,6 +24,12 @@ export interface Attendee {
     full_name: string;
     email: string;
   };
+  payment_status?: 'not_paid' | 'pending_review' | 'paid' | 'suspicious';
+  receipt_url?: string | null;
+  receipt_amount?: number | null;
+  receipt_payment_time?: string | null;
+  payment_verified_at?: string | null;
+  payment_notes?: string | null;
 }
 
 export interface ScanResult {

@@ -223,7 +223,7 @@ export default function RegisterPage() {
                         setFile(null);
                         e.target.value = ''; // Reset input
                       } else {
-                        setError(null); // Clear any previous errors
+                        setError(''); // Clear any previous errors
                         setFile(selectedFile);
                       }
                     }
