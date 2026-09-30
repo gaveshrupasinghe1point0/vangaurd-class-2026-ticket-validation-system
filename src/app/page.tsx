@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Calendar, Clock, MapPin } from 'lucide-react';
 
 export default function LandingPage() {
   return (
@@ -66,15 +67,15 @@ export default function LandingPage() {
         {/* Event details */}
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl w-full">
           {[
-            { label: 'Date', value: '24th Oct 2026', icon: '🗓' },
-            { label: 'Time', value: '6:00 PM – 11:00 PM', icon: '⏰' },
-            { label: 'Venue', value: 'Oak Ray Gatambe', icon: '🏛' },
-          ].map((item) => (
+            { label: 'Date', value: '24th Oct 2026', icon: <Calendar size={20} className="text-white/60 mb-1" /> },
+            { label: 'Time', value: '6:00 PM – 11:00 PM', icon: <Clock size={20} className="text-white/60 mb-1" /> },
+            { label: 'Venue', value: 'Oak Ray Gatambe', icon: <MapPin size={20} className="text-white/60 mb-1" /> },
+          ].map((item, idx) => (
             <div
-              key={item.label}
+              key={idx}
               className="flex flex-col items-center gap-2 px-6 py-5 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md shadow-xl hover:bg-black/60 transition-all"
             >
-              <div className="text-xl mb-1">{item.icon}</div>
+              <div className="flex items-center justify-center">{item.icon}</div>
               <span className="text-[10px] tracking-widest uppercase text-[#d4af37] font-bold">
                 {item.label}
               </span>
