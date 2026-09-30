@@ -13,7 +13,7 @@ export default function WhatsAppButton({
   token: string;
   iconOnly?: boolean;
 }) {
-  const [origin, setOrigin] = useState('https://gaveshrupasinghe.online');
+  const [origin, setOrigin] = useState('https://vanguardtickets.online');
 
   useEffect(() => {
     setOrigin(window.location.origin);
