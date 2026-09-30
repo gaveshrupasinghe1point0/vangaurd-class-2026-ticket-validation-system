@@ -64,8 +64,14 @@ export default function RegisterPage() {
         <div className="pointer-events-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#d4af37]/10 blur-[120px] z-0" />
         
         <div className="relative z-10 w-full max-w-md text-center">
-          <div className="text-6xl mb-6">🎉</div>
-          <h1 className="text-2xl font-black text-white mb-3">Registration Received!</h1>
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(34,197,94,0.2)]">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-400">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+          </div>
+          <h1 className="text-3xl font-black text-white mb-3">Registration Received!</h1>
           <p className="text-zinc-300 text-sm leading-relaxed mb-6">
             Your payment receipt has been submitted and is under review. Once your payment is verified, you will receive your QR code ticket via WhatsApp.
           </p>
