@@ -215,7 +215,19 @@ export default function RegisterPage() {
                   type="file"
                   accept="application/pdf"
                   className="hidden"
-                  onChange={e => setFile(e.target.files?.[0] ?? null)}
+                  onChange={e => {
+                    const selectedFile = e.target.files?.[0];
+                    if (selectedFile) {
+                      if (selectedFile.type !== 'application/pdf' && !selectedFile.name.toLowerCase().endsWith('.pdf')) {
+                        setError('Invalid file type. Please upload a PDF receipt.');
+                        setFile(null);
+                        e.target.value = ''; // Reset input
+                      } else {
+                        setError(null); // Clear any previous errors
+                        setFile(selectedFile);
+                      }
+                    }
+                  }}
                 />
               </div>
             </div>
