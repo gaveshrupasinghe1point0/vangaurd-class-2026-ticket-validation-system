@@ -45,32 +45,64 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <main className="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
-        <div className="pointer-events-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#d4af37]/5 blur-[120px]" />
+      <main className="min-h-screen relative flex items-center justify-center px-4 overflow-hidden">
+        {/* Background Video with Overlay */}
+        <div className="absolute inset-0 z-0 fixed overflow-hidden">
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            poster="/vanguard-bg.jpg"
+          >
+            <source src="/vanguard-bg-video.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+        </div>
+
+        <div className="pointer-events-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#d4af37]/10 blur-[120px] z-0" />
+        
         <div className="relative z-10 w-full max-w-md text-center">
           <div className="text-6xl mb-6">🎉</div>
           <h1 className="text-2xl font-black text-white mb-3">Registration Received!</h1>
-          <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+          <p className="text-zinc-300 text-sm leading-relaxed mb-6">
             Your payment receipt has been submitted and is under review. Once your payment is verified, you will receive your QR code ticket via WhatsApp.
           </p>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-left mb-6">
+          <div className="bg-black/60 backdrop-blur-md border border-zinc-700/50 rounded-2xl p-5 text-left mb-6 shadow-xl">
             <p className="text-[#d4af37] text-xs font-bold uppercase tracking-widest mb-3">⏳ What happens next?</p>
-            <ol className="space-y-2 text-sm text-zinc-400 list-decimal list-inside">
+            <ol className="space-y-2 text-sm text-zinc-300 list-decimal list-inside">
               <li>Your receipt is checked against bank records</li>
               <li>Payment is confirmed (usually within a few hours)</li>
               <li>You receive your personal QR ticket on WhatsApp</li>
               <li>Present the QR at the entrance on event day</li>
             </ol>
           </div>
-          <p className="text-zinc-600 text-xs">Questions? Contact the Vanguard 2026 team.</p>
+          <p className="text-zinc-400 text-xs font-medium">Questions? Contact the Vanguard 2026 team.</p>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#09090b] py-10 px-4">
-      <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-[#d4af37]/5 blur-[120px]" />
+    <main className="min-h-screen relative py-10 px-4 flex flex-col items-center justify-center overflow-hidden">
+      {/* Background Video with Overlay */}
+      <div className="absolute inset-0 z-0 fixed overflow-hidden">
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          poster="/vanguard-bg.jpg"
+        >
+          <source src="/vanguard-bg-video.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-[#09090b]/80" />
+      </div>
+      
+      {/* Ambient glow */}
+      <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-[#d4af37]/10 blur-[120px] z-0" />
 
       <div className="relative z-10 w-full max-w-2xl mx-auto">
         {/* Header */}
@@ -81,20 +113,20 @@ export default function RegisterPage() {
         </div>
 
         {/* Event Info Banner */}
-        <div className="bg-[#d4af37]/10 border border-[#d4af37]/20 rounded-2xl p-5 mb-6">
+        <div className="bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-2xl p-5 mb-6 shadow-lg">
           <p className="text-[#d4af37] text-xs font-bold uppercase tracking-widest mb-3">🗓 Event Details</p>
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <div><p className="text-zinc-500 text-xs">Date</p><p className="text-white font-medium">24th October 2026</p></div>
-            <div><p className="text-zinc-500 text-xs">Time</p><p className="text-white font-medium">6:00 PM – 11:00 PM</p></div>
-            <div><p className="text-zinc-500 text-xs">Venue</p><p className="text-white font-medium">Oak Ray Gatambe</p></div>
-            <div><p className="text-zinc-500 text-xs">Dress Code</p><p className="text-white font-medium">Full Black, Smart Casual</p></div>
+            <div><p className="text-zinc-400 text-xs">Date</p><p className="text-white font-medium">24th October 2026</p></div>
+            <div><p className="text-zinc-400 text-xs">Time</p><p className="text-white font-medium">6:00 PM – 11:00 PM</p></div>
+            <div><p className="text-zinc-400 text-xs">Venue</p><p className="text-white font-medium">Oak Ray Gatambe</p></div>
+            <div><p className="text-zinc-400 text-xs">Dress Code</p><p className="text-white font-medium">Full Black, Smart Casual</p></div>
           </div>
         </div>
 
         {/* Ground Rules */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mb-6">
-          <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-3">📋 Ground Rules</p>
-          <ul className="space-y-2 text-sm text-zinc-400">
+        <div className="bg-black/50 backdrop-blur-md border border-zinc-700/50 rounded-2xl p-5 mb-6 shadow-lg">
+          <p className="text-zinc-300 text-xs font-bold uppercase tracking-widest mb-3">📋 Ground Rules</p>
+          <ul className="space-y-2 text-sm text-zinc-300">
             <li>🔒 <strong className="text-white">QR is personal</strong> — do not share it. One scan only.</li>
             <li>🎟 <strong className="text-white">No physical tickets</strong> — digital QR only at entry.</li>
             <li>🚭 <strong className="text-white">No smoking</strong> inside the hall.</li>
@@ -105,22 +137,22 @@ export default function RegisterPage() {
         </div>
 
         {/* Payment Instructions */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 mb-6">
-          <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-3">💳 Payment Instructions</p>
-          <ol className="space-y-3 text-sm text-zinc-400 list-decimal list-inside">
+        <div className="bg-black/50 backdrop-blur-md border border-zinc-700/50 rounded-2xl p-5 mb-6 shadow-lg">
+          <p className="text-zinc-300 text-xs font-bold uppercase tracking-widest mb-3">💳 Payment Instructions</p>
+          <ol className="space-y-3 text-sm text-zinc-300 list-decimal list-inside">
             <li>Transfer <strong className="text-white">LKR 6,500.00</strong> to the Vanguard 2026 bank account.</li>
             <li>When transferring, set your <strong className="text-white">reference/remark</strong> to exactly:
-              <div className="mt-2 bg-black/60 border border-zinc-700 rounded-lg px-4 py-2 font-mono text-[#d4af37] text-sm tracking-wide">
+              <div className="mt-2 bg-black/80 border border-zinc-600 rounded-lg px-4 py-2 font-mono text-[#d4af37] text-sm tracking-wide shadow-inner">
                 vanguard<span className="text-white">[your NIC number]</span>
               </div>
-              <p className="mt-1.5 text-zinc-500 text-xs">Example: if your NIC is 200713102718, enter <code className="text-zinc-300">vanguard200713102718</code></p>
+              <p className="mt-1.5 text-zinc-400 text-xs">Example: if your NIC is 200713102718, enter <code className="text-zinc-200">vanguard200713102718</code></p>
             </li>
             <li>Download and upload your <strong className="text-white">PDF receipt</strong> below.</li>
           </ol>
         </div>
 
         {/* Registration Form */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+        <div className="bg-black/60 backdrop-blur-xl border border-zinc-700/60 rounded-2xl p-6 shadow-2xl">
           <h2 className="text-white font-semibold text-lg mb-5">Your Details</h2>
 
           {error && (
