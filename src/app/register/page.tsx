@@ -148,7 +148,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Event Info Banner */}
-        <div className="bg-black/40 backdrop-blur-md border border-[#d4af37]/30 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-lg">
+        <div className="bg-black/15 backdrop-blur-sm border border-[#d4af37]/15 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-lg">
           <p className="text-[#d4af37] text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-3">🗓 Event Details</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
             <div className="flex justify-between sm:block border-b border-white/5 sm:border-0 pb-2 sm:pb-0"><p className="text-zinc-400 text-xs sm:mb-1">Date</p><p className="text-white font-medium text-right sm:text-left text-xs sm:text-sm">24th Oct 2026</p></div>
@@ -159,7 +159,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Ground Rules */}
-        <div className="bg-black/50 backdrop-blur-md border border-zinc-700/50 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-lg">
+        <div className="bg-black/15 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-lg">
           <p className="text-zinc-300 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-3">📋 Ground Rules</p>
           <ul className="space-y-2.5 sm:space-y-2 text-xs sm:text-sm text-zinc-300">
             <li className="flex gap-2"><span>🔒</span><span><strong className="text-white">QR is personal</strong> — do not share it. One scan only.</span></li>
@@ -172,7 +172,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Payment Instructions */}
-        <div className="bg-black/50 backdrop-blur-md border border-zinc-700/50 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-lg">
+        <div className="bg-black/15 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-lg">
           <p className="text-zinc-300 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-3">💳 Payment Instructions</p>
           
           {/* Bank Account Details */}
@@ -247,7 +247,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Registration Form */}
-        <div className="bg-black/60 backdrop-blur-xl border border-zinc-700/60 rounded-2xl p-5 sm:p-6 shadow-2xl">
+        <div className="bg-black/15 backdrop-blur-sm border border-white/10 rounded-2xl p-5 sm:p-6 shadow-2xl">
           <h2 className="text-white font-semibold text-base sm:text-lg mb-4 sm:mb-5">Your Details</h2>
 
           {error && (
@@ -358,3 +358,4 @@ export default function RegisterPage() {
     </main>
   );
 }
+
