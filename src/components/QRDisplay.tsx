@@ -18,8 +18,8 @@ export default function QRDisplay({ token, attendeeName, isUsed }: QRDisplayProp
     const scanUrl = `${window.location.origin}/sentinel/scan?token=${token}`;
 
     QRCode.toDataURL(scanUrl, {
-      errorCorrectionLevel: 'H',
-      margin: 2,
+      errorCorrectionLevel: 'M',
+      margin: 3,
       width: 320,
       color: { dark: '#000000', light: '#ffffff' },
     }).then(setQrDataUrl);
@@ -44,17 +44,17 @@ export default function QRDisplay({ token, attendeeName, isUsed }: QRDisplayProp
     <div className="flex flex-col items-center gap-4">
       {/* QR code image */}
       <div
-        className={`relative rounded-2xl overflow-hidden border-2 ${
-          isUsed ? 'border-green-500/50 opacity-60' : 'border-white/10'
+        className={`relative border-2 rounded-xl p-1 bg-white ${
+          isUsed ? 'border-green-500/50 opacity-60' : 'border-transparent'
         }`}
       >
         <img
           src={qrDataUrl}
           alt={`QR code for ${attendeeName}`}
-          className="w-full block"
+          className="w-full block rounded-lg"
         />
         {isUsed && (
-          <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
+          <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center rounded-xl">
             <div className="bg-green-500 text-black font-black text-xs px-3 py-1.5 rounded-full tracking-widest uppercase transform -rotate-12">
               Used
             </div>
