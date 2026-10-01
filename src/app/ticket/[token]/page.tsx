@@ -22,8 +22,18 @@ export default async function PublicTicketPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white flex flex-col items-center py-12 px-4 sm:px-6">
-      <div className="w-full max-w-md bg-[#111111] border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl">
+    <div className="min-h-screen relative flex flex-col items-center py-12 px-4 sm:px-6 overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div 
+        className="absolute inset-[-5%] z-0 bg-cover bg-center bg-no-repeat fixed animate-ken-burns"
+        style={{ backgroundImage: 'url(/vanguard-bg.jpg)' }}
+      />
+      <div className="absolute inset-0 z-0 bg-black/85 fixed" />
+      
+      {/* Ambient glow */}
+      <div className="pointer-events-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#d4af37]/10 blur-[120px] z-0" />
+
+      <div className="relative z-10 w-full max-w-md bg-black/80 backdrop-blur-xl border border-zinc-700/60 rounded-2xl overflow-hidden shadow-2xl">
         
         {/* Header */}
         <div className="bg-black py-8 px-6 text-center border-b border-zinc-800">

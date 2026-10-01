@@ -4,7 +4,6 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Vanguard 2026',
   description: 'The Night. The Legend. The Vibe.',
-  icons: { icon: '/favicon.ico' },
 };
 
 export const viewport: Viewport = {
