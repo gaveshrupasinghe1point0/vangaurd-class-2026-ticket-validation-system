@@ -10,6 +10,14 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
   const [form, setForm] = useState({ full_name: '', nic: '', phone: '', email: '' });
   const [file, setFile] = useState<File | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+
+  function copyToClipboard(text: string, key: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(key);
+      setTimeout(() => setCopied(null), 2000);
+    });
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
@@ -170,15 +178,59 @@ export default function RegisterPage() {
           {/* Bank Account Details */}
           <div className="bg-[#d4af37]/5 border border-[#d4af37]/30 rounded-xl p-4 mb-4">
             <p className="text-[#d4af37] text-[10px] font-bold uppercase tracking-widest mb-3">🏦 Bank Account Details</p>
-            <div className="grid grid-cols-2 gap-y-2.5 text-xs sm:text-sm">
-              <p className="text-zinc-400">Bank</p>
-              <p className="text-white font-semibold">HNB (Hatton National Bank)</p>
-              <p className="text-zinc-400">Account Name</p>
-              <p className="text-white font-semibold">MAGG Rupasinghe</p>
-              <p className="text-zinc-400">Account Number</p>
-              <p className="text-white font-mono font-semibold tracking-wide">223020164563</p>
-              <p className="text-zinc-400">Branch</p>
-              <p className="text-white font-semibold">Peradeniya</p>
+            <div className="space-y-2.5 text-xs sm:text-sm">
+
+              {/* Bank — no copy */}
+              <div className="flex items-center justify-between">
+                <p className="text-zinc-400 shrink-0 w-32">Bank</p>
+                <p className="text-white font-semibold text-right">HNB (Hatton National Bank)</p>
+              </div>
+
+              {/* Account Name — copy */}
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-zinc-400 shrink-0 w-32">Account Name</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-white font-semibold">MAGG Rupasinghe</p>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('MAGG Rupasinghe', 'name')}
+                    className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold border transition-all duration-200 border-zinc-600 text-zinc-400 hover:border-[#d4af37]/50 hover:text-[#d4af37]"
+                  >
+                    {copied === 'name' ? '✓ Copied' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Account Number — copy */}
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-zinc-400 shrink-0 w-32">Account Number</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-white font-mono font-semibold tracking-wide">223020164563</p>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('223020164563', 'accno')}
+                    className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold border transition-all duration-200 border-zinc-600 text-zinc-400 hover:border-[#d4af37]/50 hover:text-[#d4af37]"
+                  >
+                    {copied === 'accno' ? '✓ Copied' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Branch — copy */}
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-zinc-400 shrink-0 w-32">Branch</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-white font-semibold">Peradeniya</p>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('Peradeniya', 'branch')}
+                    className="shrink-0 px-2 py-0.5 rounded-md text-[10px] font-bold border transition-all duration-200 border-zinc-600 text-zinc-400 hover:border-[#d4af37]/50 hover:text-[#d4af37]"
+                  >
+                    {copied === 'branch' ? '✓ Copied' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+
             </div>
           </div>
 
