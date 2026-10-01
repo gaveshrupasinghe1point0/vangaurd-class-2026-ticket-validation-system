@@ -4,12 +4,20 @@ import { Calendar, Clock, MapPin } from 'lucide-react';
 export default function LandingPage() {
   return (
     <main className="relative min-h-screen overflow-hidden flex flex-col">
-      {/* Background Image with Overlay */}
-      <div 
-        className="absolute inset-[-5%] z-0 bg-cover bg-center bg-no-repeat fixed animate-ken-burns"
-        style={{ backgroundImage: 'url(/vanguard-bg.jpg)' }}
-      />
-      <div className="absolute inset-0 z-0 bg-black/80 fixed" />
+      {/* Background Video with Overlay */}
+      <div className="absolute inset-0 z-0 fixed overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          poster="/vanguard-bg.jpg"
+        >
+          <source src="/vanguard-landing-video.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/70" />
+      </div>
 
       {/* Ambient glow top */}
       <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-[#d4af37]/10 blur-[120px] z-0" />
