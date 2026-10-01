@@ -25,6 +25,22 @@ export default function RegisterPage() {
       return; 
     }
 
+    // Validate NIC format: either 9 digits + V/X (old) or exactly 12 digits (new)
+    const nicClean = form.nic.trim().toUpperCase();
+    const validNIC = /^\d{9}[VX]$/.test(nicClean) || /^\d{12}$/.test(nicClean);
+    if (!validNIC) {
+      setError('Invalid NIC format. Enter either 9 digits followed by V or X (e.g. 891234567V) or 12 digits (e.g. 200713102718).');
+      return;
+    }
+
+    // Validate phone: must be a Sri Lankan number (start with 0 or 7, 10 digits)
+    const phoneClean = form.phone.trim().replace(/\s/g, '');
+    const validPhone = /^(0\d{9}|\d{9})$/.test(phoneClean);
+    if (!validPhone) {
+      setError('Invalid WhatsApp number. Enter a valid Sri Lankan mobile number (e.g. 0771234567).');
+      return;
+    }
+
     setLoading(true);
     setError('');
 

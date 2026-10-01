@@ -14,6 +14,14 @@ export async function POST(request: Request) {
     if (!full_name || !nic || !phone || !email) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
     }
+
+    // Validate NIC format server-side
+    const nicUpper = nic.toUpperCase();
+    const validNIC = /^\d{9}[VX]$/.test(nicUpper) || /^\d{12}$/.test(nicUpper);
+    if (!validNIC) {
+      return NextResponse.json({ error: 'Invalid NIC format.' }, { status: 400 });
+    }
+
     if (!receiptFile) {
       return NextResponse.json({ error: 'Payment receipt is required.' }, { status: 400 });
     }
@@ -35,6 +43,20 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         { error: `This NIC is already registered to: ${existing.full_name}` },
+        { status: 409 }
+      );
+    }
+
+    // Check for duplicate phone number
+    const { data: existingPhone } = await adminClient
+      .from('attendees')
+      .select('id, full_name')
+      .eq('phone', phone)
+      .single();
+
+    if (existingPhone) {
+      return NextResponse.json(
+        { error: `This WhatsApp number is already registered to: ${existingPhone.full_name}` },
         { status: 409 }
       );
     }
