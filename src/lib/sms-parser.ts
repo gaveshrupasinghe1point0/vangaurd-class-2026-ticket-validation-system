@@ -25,8 +25,8 @@ export function parseBankSMS(text: string): ParsedSMS[] {
       const amountMatch = msg.match(/LKR\s*([\d,]+\.?\d*)\s*credited/i);
       // Timestamp: on 01/10/26 03:44:51
       const timeMatch = msg.match(/on\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/i);
-      // Reference: V{NIC} — NIC is either 9 digits+V/X or 12 digits
-      const refMatch = msg.match(/[Rr]eason\s*:?\s*[Vv](\d{9}[VvXx]|\d{12})/i);
+      // Reference: V{NIC} — handles bank-added prefixes like "CEFT-V200713102718"
+      const refMatch = msg.match(/[Rr]eason\s*:?\s*[\w\-]*[Vv](\d{9}[VvXx]|\d{12})/i);
       // Balance: Bal:LKR 6,500.96
       const balMatch = msg.match(/Bal\s*:?\s*LKR\s*([\d,]+\.?\d*)/i);
 
