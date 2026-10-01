@@ -27,8 +27,16 @@ export default function WhatsAppButton({
     );
   }
 
-  // Clean phone number — remove spaces, dashes, and leading +
-  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+  // Clean phone number — remove spaces, dashes, and +
+  let cleanPhone = phone.replace(/[\s\-\(\)\+]/g, '');
+  
+  // Format for Sri Lanka (+94) if it starts with a local 0 or is missing country code
+  if (cleanPhone.startsWith('0')) {
+    cleanPhone = '94' + cleanPhone.substring(1);
+  } else if (!cleanPhone.startsWith('94')) {
+    cleanPhone = '94' + cleanPhone;
+  }
+
   const waUrl = `https://wa.me/${cleanPhone}?text=${buildMessage()}`;
 
   if (iconOnly) {
