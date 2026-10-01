@@ -153,7 +153,7 @@ export default function RegisterPage() {
               </div>
               <p className="mt-1.5 text-zinc-400 text-[10px] sm:text-xs leading-relaxed">Example: if your NIC is 200713102718, enter <code className="text-zinc-200 bg-zinc-800/50 px-1 py-0.5 rounded">vanguard200713102718</code></p>
             </li>
-            <li>Download and upload your <strong className="text-white">PDF receipt</strong> below.</li>
+            <li>Download and upload your <strong className="text-white">PDF or Image receipt</strong> below.</li>
           </ol>
         </div>
 
@@ -196,7 +196,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-zinc-300 text-xs sm:text-sm font-medium mb-1.5 mt-2 sm:mt-0">Payment Receipt (PDF)</label>
+              <label className="block text-zinc-300 text-xs sm:text-sm font-medium mb-1.5 mt-2 sm:mt-0">Payment Receipt (PDF or Image)</label>
               <div
                 className={`border-2 border-dashed rounded-xl p-5 sm:p-6 text-center transition-all cursor-pointer ${
                   file ? 'border-[#d4af37]/50 bg-[#d4af37]/10' : 'border-zinc-700/80 bg-zinc-900/50 hover:border-zinc-500/80'
@@ -205,7 +205,7 @@ export default function RegisterPage() {
               >
                 {file ? (
                   <div className="flex flex-col items-center">
-                    <div className="text-2xl sm:text-3xl mb-2">📄</div>
+                    <div className="text-2xl sm:text-3xl mb-2">{file.type.startsWith('image/') ? '🖼️' : '📄'}</div>
                     <p className="text-[#d4af37] text-xs sm:text-sm font-medium truncate w-full px-2 max-w-[250px] sm:max-w-xs">{file.name}</p>
                     <p className="text-zinc-400 text-[10px] sm:text-xs mt-1">{(file.size / 1024).toFixed(1)} KB — click to change</p>
                   </div>
@@ -213,19 +213,20 @@ export default function RegisterPage() {
                   <div className="flex flex-col items-center">
                     <div className="text-3xl sm:text-4xl mb-2 sm:mb-3 opacity-80">📎</div>
                     <p className="text-zinc-300 text-xs sm:text-sm font-medium">Upload bank receipt</p>
-                    <p className="text-zinc-500 text-[10px] sm:text-xs mt-1">PDF format only</p>
+                    <p className="text-zinc-500 text-[10px] sm:text-xs mt-1">PDF, JPG, or PNG</p>
                   </div>
                 )}
                 <input
                   id="receipt-upload"
                   type="file"
-                  accept="application/pdf"
+                  accept="application/pdf,image/jpeg,image/png,image/jpg"
                   className="hidden"
                   onChange={e => {
                     const selectedFile = e.target.files?.[0];
                     if (selectedFile) {
-                      if (selectedFile.type !== 'application/pdf' && !selectedFile.name.toLowerCase().endsWith('.pdf')) {
-                        setError('Invalid file type. Please upload a PDF receipt.');
+                      const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+                      if (!validTypes.includes(selectedFile.type) && !selectedFile.name.toLowerCase().match(/\.(pdf|jpg|jpeg|png)$/)) {
+                        setError('Invalid file type. Please upload a PDF or image receipt.');
                         setFile(null);
                         e.target.value = ''; // Reset input
                       } else {

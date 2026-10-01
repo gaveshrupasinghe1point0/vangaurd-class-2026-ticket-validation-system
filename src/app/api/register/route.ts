@@ -15,10 +15,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
     }
     if (!receiptFile) {
-      return NextResponse.json({ error: 'Payment receipt PDF is required.' }, { status: 400 });
+      return NextResponse.json({ error: 'Payment receipt is required.' }, { status: 400 });
     }
-    if (receiptFile.type !== 'application/pdf') {
-      return NextResponse.json({ error: 'Only PDF files are accepted.' }, { status: 400 });
+    
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!validTypes.includes(receiptFile.type)) {
+      return NextResponse.json({ error: 'Only PDF, JPG, and PNG files are accepted.' }, { status: 400 });
     }
 
     const adminClient = createAdminClient();
@@ -37,20 +39,34 @@ export async function POST(request: Request) {
       );
     }
 
-    // Parse the PDF
     const arrayBuffer = await receiptFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const parsed = await parseReceiptPDF(buffer);
 
-    // Default to pending review since we can't reliably parse image-based PDFs from HNB
+    let parsed = { transactionRef: null, amount: null, paymentTime: null };
+    
+    // Only attempt to parse if it is actually a PDF
+    if (receiptFile.type === 'application/pdf') {
+      try {
+        parsed = await parseReceiptPDF(buffer);
+      } catch (e) {
+        console.error('PDF parsing skipped or failed:', e);
+      }
+    }
+
+    // Default to pending review since we rely on SMS verification
     const paymentStatus = 'pending_review';
     const paymentNotes = 'Awaiting SMS verification or manual review.';
 
-    // Upload PDF to Supabase Storage (bucket named 'reciepts')
-    const fileName = `reciepts/${nic}-${Date.now()}.pdf`;
+    // Determine extension
+    let ext = 'pdf';
+    if (receiptFile.type === 'image/jpeg' || receiptFile.type === 'image/jpg') ext = 'jpg';
+    if (receiptFile.type === 'image/png') ext = 'png';
+
+    // Upload file to Supabase Storage (bucket named 'reciepts')
+    const fileName = `reciepts/${nic}-${Date.now()}.${ext}`;
     const { error: uploadError } = await adminClient.storage
       .from('reciepts')
-      .upload(fileName, buffer, { contentType: 'application/pdf', upsert: false });
+      .upload(fileName, buffer, { contentType: receiptFile.type, upsert: false });
 
     if (uploadError) {
       console.error('Storage upload error:', uploadError);
