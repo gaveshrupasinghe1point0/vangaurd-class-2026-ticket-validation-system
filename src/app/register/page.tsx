@@ -173,7 +173,7 @@ export default function RegisterPage() {
                 <label className="block text-zinc-300 text-xs sm:text-sm font-medium mb-1.5">Full Name</label>
                 <input name="full_name" value={form.full_name} onChange={handleChange} required
                   className="w-full bg-zinc-900/80 border border-zinc-700/80 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-[#d4af37]/60 focus:ring-1 focus:ring-[#d4af37]/30 transition-all text-sm shadow-inner"
-                  placeholder="As on your NIC" />
+                  placeholder="Your full name" />
               </div>
               <div>
                 <label className="block text-zinc-300 text-xs sm:text-sm font-medium mb-1.5">NIC Number</label>
@@ -182,7 +182,7 @@ export default function RegisterPage() {
                   placeholder="200713102718" />
               </div>
               <div>
-                <label className="block text-zinc-300 text-xs sm:text-sm font-medium mb-1.5">Phone Number</label>
+                <label className="block text-zinc-300 text-xs sm:text-sm font-medium mb-1.5">WhatsApp Number</label>
                 <input name="phone" value={form.phone} onChange={handleChange} required
                   className="w-full bg-zinc-900/80 border border-zinc-700/80 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-[#d4af37]/60 focus:ring-1 focus:ring-[#d4af37]/30 transition-all text-sm shadow-inner"
                   placeholder="07XXXXXXXX" />
