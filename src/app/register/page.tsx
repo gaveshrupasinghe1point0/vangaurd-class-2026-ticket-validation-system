@@ -83,7 +83,6 @@ export default function RegisterPage() {
             muted 
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
-            poster="/vanguard-bg.jpg"
           >
             <source src="/vanguard-bg-video.mp4" type="video/mp4" />
           </video>
@@ -129,7 +128,6 @@ export default function RegisterPage() {
           muted 
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          poster="/vanguard-bg.jpg"
         >
           <source src="/vanguard-bg-video.mp4" type="video/mp4" />
         </video>
@@ -358,5 +356,6 @@ export default function RegisterPage() {
     </main>
   );
 }
+
 
 

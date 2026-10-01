@@ -12,7 +12,6 @@ export default function LandingPage() {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          poster="/vanguard-bg.jpg"
         >
           <source src="/vanguard-landing-video.mp4" type="video/mp4" />
         </video>
@@ -102,3 +101,4 @@ export default function LandingPage() {
     </main>
   );
 }
+
