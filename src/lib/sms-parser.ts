@@ -12,8 +12,12 @@ export interface ParsedSMS {
 
 export function parseBankSMS(text: string): ParsedSMS[] {
   const results: ParsedSMS[] = [];
-  // Split by newlines or double newlines to handle multiple messages pasted at once
-  const messages = text.split(/\n{2,}|\r\n{2,}/).map(m => m.trim()).filter(Boolean);
+  
+  // Extract individual SMS messages by matching the common structure:
+  // "LKR [amount] credited to ... Hotline [number]"
+  // This handles cases where messages are pasted back-to-back without newlines (e.g. "...Hotline 0112462462LKR 6,500.00...")
+  const smsPattern = /LKR\s+[\d,]+\.?\d*\s+credited to[\s\S]*?Hotline\s+\d+/gi;
+  const messages = text.match(smsPattern) || [];
 
   for (const msg of messages) {
     try {
