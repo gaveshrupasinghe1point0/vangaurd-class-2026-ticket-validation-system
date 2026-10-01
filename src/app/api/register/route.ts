@@ -41,8 +41,11 @@ export async function POST(request: Request) {
 
     const arrayBuffer = await receiptFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-
-    let parsed = { transactionRef: null, amount: null, paymentTime: null };
+    let parsed: { transactionRef: string | null, amount: number | null, paymentTime: string | null } = { 
+      transactionRef: null, 
+      amount: null, 
+      paymentTime: null 
+    };
     
     // Only attempt to parse if it is actually a PDF
     if (receiptFile.type === 'application/pdf') {
