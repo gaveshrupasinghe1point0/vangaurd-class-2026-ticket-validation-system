@@ -17,8 +17,13 @@ export default function RegisterPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!file) { setError('Please upload your bank payment receipt (PDF).'); return; }
-    if (file.type !== 'application/pdf') { setError('Only PDF files are accepted.'); return; }
+    if (!file) { setError('Please upload your bank payment receipt (PDF or Image).'); return; }
+    
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+    if (!validTypes.includes(file.type) && !file.name.toLowerCase().match(/\.(pdf|jpg|jpeg|png)$/)) {
+      setError('Only PDF, JPG, and PNG files are accepted.'); 
+      return; 
+    }
 
     setLoading(true);
     setError('');
