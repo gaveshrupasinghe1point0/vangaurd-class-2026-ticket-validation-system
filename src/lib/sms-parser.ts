@@ -25,8 +25,8 @@ export function parseBankSMS(text: string): ParsedSMS[] {
       const amountMatch = msg.match(/LKR\s*([\d,]+\.?\d*)\s*credited/i);
       // Timestamp: on 01/10/26 03:44:51
       const timeMatch = msg.match(/on\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/i);
-      // Reference: Reason:vanguard{NIC}
-      const refMatch = msg.match(/[Rr]eason\s*:?\s*(vanguard\w+)/i);
+      // Reference: Reason:V{NIC} or vanguard{NIC}
+      const refMatch = msg.match(/[Rr]eason\s*:?\s*(v(?:anguard)?\w+)/i);
       // Balance: Bal:LKR 6,500.96
       const balMatch = msg.match(/Bal\s*:?\s*LKR\s*([\d,]+\.?\d*)/i);
 
@@ -37,8 +37,8 @@ export function parseBankSMS(text: string): ParsedSMS[] {
       const balance = balMatch ? parseFloat(balMatch[1].replace(/,/g, '')) : 0;
       const reference = refMatch ? refMatch[1] : '';
 
-      // Extract NIC from reference (everything after "vanguard")
-      const nicMatch = reference.match(/vanguard(\w+)/i);
+      // Extract NIC from reference (everything after "v" or "vanguard")
+      const nicMatch = reference.match(/v(?:anguard)?(\w+)/i);
       const nic = nicMatch ? nicMatch[1] : '';
 
       let suspicious = false;
@@ -49,7 +49,7 @@ export function parseBankSMS(text: string): ParsedSMS[] {
         suspicionReason = `Amount mismatch: expected LKR 6,500.00 but got LKR ${amount.toLocaleString()}`;
       } else if (!nic) {
         suspicious = true;
-        suspicionReason = 'No valid vanguard reference found in SMS';
+        suspicionReason = 'No valid V[NIC] or vanguard[NIC] reference found in SMS';
       } else if (balance < 0) {
         suspicious = true;
         suspicionReason = `Negative balance after transfer: LKR ${balance}`;
