@@ -166,8 +166,24 @@ export default function RegisterPage() {
         {/* Payment Instructions */}
         <div className="bg-black/50 backdrop-blur-md border border-zinc-700/50 rounded-2xl p-4 sm:p-5 mb-5 sm:mb-6 shadow-lg">
           <p className="text-zinc-300 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-3">💳 Payment Instructions</p>
+          
+          {/* Bank Account Details */}
+          <div className="bg-[#d4af37]/5 border border-[#d4af37]/30 rounded-xl p-4 mb-4">
+            <p className="text-[#d4af37] text-[10px] font-bold uppercase tracking-widest mb-3">🏦 Bank Account Details</p>
+            <div className="grid grid-cols-2 gap-y-2.5 text-xs sm:text-sm">
+              <p className="text-zinc-400">Bank</p>
+              <p className="text-white font-semibold">HNB (Hatton National Bank)</p>
+              <p className="text-zinc-400">Account Name</p>
+              <p className="text-white font-semibold">MAGG Rupasinghe</p>
+              <p className="text-zinc-400">Account Number</p>
+              <p className="text-white font-mono font-semibold tracking-wide">223020164563</p>
+              <p className="text-zinc-400">Branch</p>
+              <p className="text-white font-semibold">Peradeniya</p>
+            </div>
+          </div>
+
           <ol className="space-y-4 sm:space-y-3 text-xs sm:text-sm text-zinc-300 list-decimal list-inside">
-            <li>Transfer <strong className="text-white">LKR 6,500.00</strong> to the Vanguard 2026 bank account.</li>
+            <li>Transfer <strong className="text-white">LKR 6,500.00</strong> to the account above.</li>
             <li>When transferring, set your <strong className="text-white">reference/remark</strong> to exactly:
               <div className="mt-2 bg-black/80 border border-zinc-600 rounded-lg px-3 sm:px-4 py-2 font-mono text-[#d4af37] text-xs sm:text-sm tracking-wide shadow-inner overflow-hidden text-ellipsis whitespace-nowrap">
                 V<span className="text-white">[your NIC]</span>
