@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-server';
 import { parseReceiptPDF } from '@/lib/pdf-parser';
+import { Resend } from 'resend';
 
 export async function POST(request: Request) {
   try {
@@ -129,6 +130,37 @@ export async function POST(request: Request) {
     if (insertError) {
       console.error('Insert error:', insertError);
       return NextResponse.json({ error: 'Failed to save registration.' }, { status: 500 });
+    }
+
+    // Send admin notification email (fire-and-forget — never blocks registration)
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      await resend.emails.send({
+        from: 'Vanguard 2026 <onboarding@resend.dev>',
+        to: 'gimhanarupasinghe516@gmail.com',
+        subject: `🎟 New Registration — ${full_name}`,
+        html: `
+          <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#fff;border-radius:12px;overflow:hidden;">
+            <div style="background:#d4af37;padding:20px 24px;">
+              <h1 style="margin:0;font-size:20px;color:#000;font-weight:900;letter-spacing:0.1em;">VANGUARD 2026</h1>
+              <p style="margin:4px 0 0;font-size:12px;color:#000;opacity:0.7;">New Attendee Registration</p>
+            </div>
+            <div style="padding:24px;">
+              <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                <tr><td style="padding:8px 0;color:#a1a1aa;width:130px;">Full Name</td><td style="padding:8px 0;font-weight:600;">${full_name}</td></tr>
+                <tr><td style="padding:8px 0;color:#a1a1aa;">NIC</td><td style="padding:8px 0;font-family:monospace;">${nic}</td></tr>
+                <tr><td style="padding:8px 0;color:#a1a1aa;">WhatsApp</td><td style="padding:8px 0;">${phone}</td></tr>
+                <tr><td style="padding:8px 0;color:#a1a1aa;">Email</td><td style="padding:8px 0;">${email}</td></tr>
+                <tr><td style="padding:8px 0;color:#a1a1aa;">Status</td><td style="padding:8px 0;color:#f59e0b;font-weight:600;">Pending Review</td></tr>
+                ${receiptUrl ? `<tr><td style="padding:8px 0;color:#a1a1aa;">Receipt</td><td style="padding:8px 0;"><a href="${receiptUrl}" style="color:#d4af37;">View Receipt</a></td></tr>` : ''}
+              </table>
+              <p style="margin:20px 0 0;font-size:12px;color:#52525b;">Paste the bank SMS into the admin dashboard to verify payment and send the QR ticket.</p>
+            </div>
+          </div>
+        `,
+      });
+    } catch (emailErr) {
+      console.error('Admin notification email failed (non-critical):', emailErr);
     }
 
     return NextResponse.json({ success: true, id: data.id, paymentStatus }, { status: 201 });
