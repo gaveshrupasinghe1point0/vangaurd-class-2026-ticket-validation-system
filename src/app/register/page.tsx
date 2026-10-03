@@ -234,11 +234,18 @@ export default function RegisterPage() {
 
           <ol className="space-y-4 sm:space-y-3 text-xs sm:text-sm text-zinc-300 list-decimal list-inside">
             <li>Transfer <strong className="text-white">LKR 6,500.00</strong> to the account above.</li>
-            <li>When transferring, set your <strong className="text-white">reference/remark</strong> to exactly:
-              <div className="mt-2 bg-black/80 border border-zinc-600 rounded-lg px-3 sm:px-4 py-2 font-mono text-[#d4af37] text-xs sm:text-sm tracking-wide shadow-inner overflow-hidden text-ellipsis whitespace-nowrap">
-                <span className="text-white">[your NIC]</span>
+            <li>
+              {/* Highlighted reference step */}
+              <div className="mt-2 bg-amber-500/10 border border-amber-500/40 rounded-xl p-3 sm:p-4 -ml-4">
+                <p className="text-amber-400 text-[10px] font-bold uppercase tracking-widest mb-2">⚠️ Important — Reference / Remark</p>
+                <p className="text-zinc-200 text-xs sm:text-sm mb-2 leading-relaxed">
+                  When making the transfer, you <strong className="text-white">must</strong> set the reference/remark field to your <strong className="text-white">NIC number</strong>. Without this, your payment cannot be verified.
+                </p>
+                <div className="bg-black/60 border border-zinc-600 rounded-lg px-3 sm:px-4 py-2 font-mono text-[#d4af37] text-xs sm:text-sm tracking-wide shadow-inner overflow-hidden text-ellipsis whitespace-nowrap">
+                  <span className="text-white">[your NIC]</span>
+                </div>
+                <p className="mt-1.5 text-zinc-400 text-[10px] sm:text-xs leading-relaxed">Example: if your NIC is 200713102718, enter <code className="text-zinc-200 bg-zinc-800/50 px-1 py-0.5 rounded">200713102718</code></p>
               </div>
-              <p className="mt-1.5 text-zinc-400 text-[10px] sm:text-xs leading-relaxed">Example: if your NIC is 200713102718, enter <code className="text-zinc-200 bg-zinc-800/50 px-1 py-0.5 rounded">200713102718</code></p>
             </li>
             <li>Download and upload your <strong className="text-white">PDF or Image receipt</strong> below.</li>
           </ol>
