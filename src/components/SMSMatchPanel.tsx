@@ -11,6 +11,7 @@ export default function SMSMatchPanel() {
     matched: { nic: string; name: string; amount: number; time: string }[];
     suspicious: { nic: string; reason: string; amount: number }[];
     notFound: { nic: string; reference: string }[];
+    crashes: { nic: string; transactions: { amount: number; time: string; balance: number }[]; registeredName: string; receiptUrl: string }[];
     totalParsed: number;
   }>(null);
   const [error, setError] = useState('');
@@ -47,7 +48,7 @@ export default function SMSMatchPanel() {
         onChange={e => setSmsText(e.target.value)}
         rows={6}
         className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white text-sm font-mono placeholder-zinc-600 focus:outline-none focus:border-[#d4af37]/60 resize-none transition-all"
-        placeholder={`LKR 6,500.00 credited to Ac No:22302XXXXX25 on 01/10/26 03:44:51 Reason:vanguard200713102718 Bal:LKR 6,500.96...\n\nPaste multiple SMS messages separated by blank lines`}
+        placeholder={`LKR 6,500.00 credited to Ac No:22302XXXXX25 on 01/10/26 03:44:51 Reason:200713102718 Bal:LKR 6,500.96...\n\nPaste multiple SMS messages separated by blank lines`}
       />
 
       {error && (
@@ -87,6 +88,36 @@ export default function SMSMatchPanel() {
                   <li key={i} className="text-red-300 text-xs">{s.nic || 'Unknown'} — {s.reason}</li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {results.crashes && results.crashes.length > 0 && (
+            <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4">
+              <p className="text-orange-400 text-sm font-semibold mb-1">🚨 {results.crashes.length} Reference Crash(es) Detected</p>
+              <p className="text-orange-300/70 text-xs mb-3">These NICs appeared multiple times in the SMS batch. No one was auto-approved. Review manually and verify who actually paid.</p>
+              <div className="space-y-3">
+                {results.crashes.map((c, i) => (
+                  <div key={i} className="bg-black/30 border border-orange-500/20 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <span className="text-white text-xs font-semibold">{c.registeredName}</span>
+                        <span className="text-orange-300 text-xs font-mono ml-2">({c.nic})</span>
+                      </div>
+                      {c.receiptUrl && (
+                        <a href={c.receiptUrl} target="_blank" rel="noopener noreferrer" className="text-[#d4af37] text-xs hover:underline">View Receipt</a>
+                      )}
+                    </div>
+                    <p className="text-orange-300/70 text-[11px] mb-1.5">{c.transactions.length} payments found with this NIC as reference:</p>
+                    <ul className="space-y-1">
+                      {c.transactions.map((t, j) => (
+                        <li key={j} className="text-orange-200 text-xs">
+                          LKR {t.amount.toLocaleString()} at {t.time} — Bal after: LKR {t.balance.toLocaleString()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

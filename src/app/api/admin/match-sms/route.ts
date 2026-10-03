@@ -25,13 +25,42 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No valid bank SMS messages found in the text.' }, { status: 400 });
   }
 
+  // Detect reference crashes — same NIC appearing in multiple SMS messages
+  const nicCounts: Record<string, number> = {};
+  for (const sms of parsed) {
+    if (sms.nic) nicCounts[sms.nic] = (nicCounts[sms.nic] ?? 0) + 1;
+  }
+  const crashedNICs = new Set(Object.entries(nicCounts).filter(([, count]) => count > 1).map(([nic]) => nic));
+
   const results = {
     matched: [] as { nic: string; name: string; amount: number; time: string }[],
     suspicious: [] as { nic: string; reason: string; amount: number }[],
     notFound: [] as { nic: string; reference: string }[],
+    crashes: [] as { nic: string; transactions: { amount: number; time: string; balance: number }[]; registeredName: string; receiptUrl: string }[],
   };
 
   for (const sms of parsed) {
+    // Handle reference crashes — do NOT auto-approve, collect for manual review
+    if (crashedNICs.has(sms.nic)) {
+      let crashEntry = results.crashes.find(c => c.nic === sms.nic);
+      if (!crashEntry) {
+        const { data: crashAttendee } = await adminClient
+          .from('attendees')
+          .select('full_name, receipt_url')
+          .eq('nic', sms.nic)
+          .single();
+        crashEntry = {
+          nic: sms.nic,
+          transactions: [],
+          registeredName: crashAttendee?.full_name ?? 'Unknown',
+          receiptUrl: crashAttendee?.receipt_url ?? '',
+        };
+        results.crashes.push(crashEntry);
+      }
+      crashEntry.transactions.push({ amount: sms.amount, time: sms.timestamp, balance: sms.balance });
+      continue;
+    }
+
     if (sms.suspicious) {
       results.suspicious.push({ nic: sms.nic, reason: sms.suspicionReason ?? '', amount: sms.amount });
       continue;
