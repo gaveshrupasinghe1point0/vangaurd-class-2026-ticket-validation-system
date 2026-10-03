@@ -15,7 +15,7 @@ export function parseBankSMS(text: string): ParsedSMS[] {
   
   // Extract individual SMS messages by matching the common structure:
   // "LKR [amount] credited to ... Hotline [number]"
-  // This handles cases where messages are pasted back-to-back without newlines (e.g. "...Hotline 0112462462LKR 6,500.00...")
+  // This handles cases where messages are pasted back-to-back without newlines
   const smsPattern = /LKR\s+[\d,]+\.?\d*\s+credited to[\s\S]*?Hotline\s+\d+/gi;
   const messages = text.match(smsPattern) || [];
 
@@ -25,8 +25,10 @@ export function parseBankSMS(text: string): ParsedSMS[] {
       const amountMatch = msg.match(/LKR\s*([\d,]+\.?\d*)\s*credited/i);
       // Timestamp: on 01/10/26 03:44:51
       const timeMatch = msg.match(/on\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/i);
-      // Reference: V{NIC} — handles bank-added prefixes like "CEFT-V200713102718"
-      const refMatch = msg.match(/[Rr]eason\s*:?\s*[\w\-]*[Vv](\d{9}[VvXx]|\d{12})/i);
+      // Reference: NIC directly as reference (9 digits+V/X or 12 digits)
+      // Also handles bank-added prefixes like "CEFT-" before the NIC
+      // Matches both old V[NIC] format and new plain NIC format
+      const refMatch = msg.match(/[Rr]eason\s*:?\s*[\w\-]*?(\d{9}[VvXx]|\d{12})/i);
       // Balance: Bal:LKR 6,500.96
       const balMatch = msg.match(/Bal\s*:?\s*LKR\s*([\d,]+\.?\d*)/i);
 
@@ -38,7 +40,7 @@ export function parseBankSMS(text: string): ParsedSMS[] {
 
       // NIC is the captured group directly
       const nic = refMatch ? refMatch[1].toUpperCase() : '';
-      const reference = nic ? `V${nic}` : '';
+      const reference = nic;
 
       let suspicious = false;
       let suspicionReason = '';
@@ -48,7 +50,7 @@ export function parseBankSMS(text: string): ParsedSMS[] {
         suspicionReason = `Amount mismatch: expected LKR 6,500.00 but got LKR ${amount.toLocaleString()}`;
       } else if (!nic) {
         suspicious = true;
-        suspicionReason = 'No valid V[NIC] reference found in SMS';
+        suspicionReason = 'No valid NIC reference found in SMS';
       } else if (balance < 0) {
         suspicious = true;
         suspicionReason = `Negative balance after transfer: LKR ${balance}`;

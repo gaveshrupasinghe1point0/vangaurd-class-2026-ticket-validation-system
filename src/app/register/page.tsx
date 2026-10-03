@@ -236,9 +236,9 @@ export default function RegisterPage() {
             <li>Transfer <strong className="text-white">LKR 6,500.00</strong> to the account above.</li>
             <li>When transferring, set your <strong className="text-white">reference/remark</strong> to exactly:
               <div className="mt-2 bg-black/80 border border-zinc-600 rounded-lg px-3 sm:px-4 py-2 font-mono text-[#d4af37] text-xs sm:text-sm tracking-wide shadow-inner overflow-hidden text-ellipsis whitespace-nowrap">
-                V<span className="text-white">[your NIC]</span>
+                <span className="text-white">[your NIC]</span>
               </div>
-              <p className="mt-1.5 text-zinc-400 text-[10px] sm:text-xs leading-relaxed">Example: if your NIC is 200713102718, enter <code className="text-zinc-200 bg-zinc-800/50 px-1 py-0.5 rounded">V200713102718</code></p>
+              <p className="mt-1.5 text-zinc-400 text-[10px] sm:text-xs leading-relaxed">Example: if your NIC is 200713102718, enter <code className="text-zinc-200 bg-zinc-800/50 px-1 py-0.5 rounded">200713102718</code></p>
             </li>
             <li>Download and upload your <strong className="text-white">PDF or Image receipt</strong> below.</li>
           </ol>
@@ -356,6 +356,7 @@ export default function RegisterPage() {
     </main>
   );
 }
+
 
 
 
