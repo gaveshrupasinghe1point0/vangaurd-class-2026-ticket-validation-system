@@ -28,7 +28,7 @@ export function parseBankSMS(text: string): ParsedSMS[] {
       // Reference: NIC directly as reference (9 digits+V/X or 12 digits)
       // Also handles bank-added prefixes like "CEFT-" before the NIC
       // Matches both old V[NIC] format and new plain NIC format
-      const refMatch = msg.match(/[Rr]eason\s*:?\s*[\w\-]*?(\d{9}[VvXx]|\d{12})/i);
+      const refMatch = msg.match(/[Rr]eason\s*:?\s*[A-Za-z\-]*(\d{9}[VvXx]|\d{12})/i);
       // Balance: Bal:LKR 6,500.96
       const balMatch = msg.match(/Bal\s*:?\s*LKR\s*([\d,]+\.?\d*)/i);
 
