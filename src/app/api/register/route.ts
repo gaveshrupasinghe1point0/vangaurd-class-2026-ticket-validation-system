@@ -139,7 +139,7 @@ export async function POST(request: Request) {
       // Email 1: Admin notification
       await resend.emails.send({
         from: 'Vanguard 2026 <onboarding@resend.dev>',
-        to: 'gimhanarupasinghe516@gmail.com',
+        to: ['gimhanarupasinghe516@gmail.com', 'rochanakuvindu85@gmail.com'],
         subject: `🎟 New Registration — ${full_name}`,
         html: `
           <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#fff;border-radius:12px;overflow:hidden;">
