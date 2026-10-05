@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-server';
-import { parseReceiptPDF, type ParsedReceipt } from '@/lib/pdf-parser';
+import { parseReceiptPDF, parseReceiptText, type ParsedReceipt } from '@/lib/pdf-parser';
+import { ocrReceiptImage } from '@/lib/image-ocr';
 import { Resend } from 'resend';
+
+// Image OCR can take a few seconds — give the function headroom
+export const maxDuration = 30;
 
 export async function POST(request: Request) {
   try {
@@ -66,13 +70,16 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(arrayBuffer);
     let parsed: ParsedReceipt | null = null;
 
-    // Read the receipt (PDFs only for now — text-based PDFs from bank apps)
+    // Read the receipt — PDFs via text extraction, photos via Gemini OCR
     if (receiptFile.type === 'application/pdf') {
       try {
         parsed = await parseReceiptPDF(buffer);
       } catch (e) {
         console.error('PDF parsing skipped or failed:', e);
       }
+    } else {
+      const ocrText = await ocrReceiptImage(buffer, receiptFile.type);
+      if (ocrText) parsed = parseReceiptText(ocrText);
     }
 
     // Cross-check what's on the receipt against what they typed.
@@ -98,8 +105,8 @@ export async function POST(request: Request) {
         checks.push('✓ Amount LKR 6,500');
       }
       paymentNotes = `${checks.join(' · ')}. Awaiting SMS verification.`;
-    } else if (receiptFile.type !== 'application/pdf') {
-      paymentNotes = 'Image receipt — check manually. Awaiting SMS verification.';
+    } else {
+      paymentNotes = 'Receipt could not be read automatically — check manually. Awaiting SMS verification.';
     }
 
     // Determine extension
