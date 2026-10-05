@@ -70,12 +70,19 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(arrayBuffer);
     let parsed: ParsedReceipt | null = null;
 
-    // Read the receipt — PDFs via text extraction, photos via Gemini OCR
+    // Read the receipt:
+    //  - PDFs: fast text extraction first; if it can't find the NIC/amount
+    //    (e.g. a scanned PDF with no text layer), fall back to Gemini
+    //  - Photos: Gemini OCR
     if (receiptFile.type === 'application/pdf') {
       try {
         parsed = await parseReceiptPDF(buffer);
       } catch (e) {
-        console.error('PDF parsing skipped or failed:', e);
+        console.error('PDF text extraction failed:', e);
+      }
+      if (!parsed || !parsed.nic || parsed.amount === null) {
+        const ocrText = await ocrReceiptImage(buffer, 'application/pdf');
+        if (ocrText) parsed = parseReceiptText(ocrText);
       }
     } else {
       const ocrText = await ocrReceiptImage(buffer, receiptFile.type);
