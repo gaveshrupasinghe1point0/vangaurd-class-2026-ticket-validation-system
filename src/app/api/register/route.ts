@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-server';
-import { parseReceiptPDF } from '@/lib/pdf-parser';
+import { parseReceiptPDF, type ParsedReceipt } from '@/lib/pdf-parser';
 import { Resend } from 'resend';
 
 export async function POST(request: Request) {
@@ -64,13 +64,9 @@ export async function POST(request: Request) {
 
     const arrayBuffer = await receiptFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    let parsed: { transactionRef: string | null, amount: number | null, paymentTime: string | null } = { 
-      transactionRef: null, 
-      amount: null, 
-      paymentTime: null 
-    };
-    
-    // Only attempt to parse if it is actually a PDF
+    let parsed: ParsedReceipt | null = null;
+
+    // Read the receipt (PDFs only for now — text-based PDFs from bank apps)
     if (receiptFile.type === 'application/pdf') {
       try {
         parsed = await parseReceiptPDF(buffer);
@@ -79,9 +75,32 @@ export async function POST(request: Request) {
       }
     }
 
-    // Default to pending review since we rely on SMS verification
+    // Cross-check what's on the receipt against what they typed.
+    // Status stays pending_review — the bank SMS is still the source of truth.
     const paymentStatus = 'pending_review';
-    const paymentNotes = 'Awaiting SMS verification or manual review.';
+    const registeredNIC = nic.toUpperCase();
+    let paymentNotes = 'Awaiting SMS verification or manual review.';
+
+    if (parsed) {
+      const checks: string[] = [];
+      if (!parsed.nic) {
+        checks.push('⚠ No NIC reference found on receipt');
+      } else if (parsed.nic !== registeredNIC) {
+        checks.push(`⚠ Receipt reference ${parsed.nic} does NOT match registered NIC`);
+      } else {
+        checks.push('✓ Receipt reference matches NIC');
+      }
+      if (parsed.amount === null) {
+        checks.push('⚠ Amount unreadable');
+      } else if (parsed.amount !== 6500) {
+        checks.push(`⚠ Receipt amount LKR ${parsed.amount.toLocaleString()} (expected 6,500)`);
+      } else {
+        checks.push('✓ Amount LKR 6,500');
+      }
+      paymentNotes = `${checks.join(' · ')}. Awaiting SMS verification.`;
+    } else if (receiptFile.type !== 'application/pdf') {
+      paymentNotes = 'Image receipt — check manually. Awaiting SMS verification.';
+    }
 
     // Determine extension
     let ext = 'pdf';
@@ -119,9 +138,9 @@ export async function POST(request: Request) {
         qr_used: false,
         payment_status: paymentStatus,
         receipt_url: receiptUrl,
-        receipt_transaction_ref: parsed.transactionRef,
-        receipt_amount: parsed.amount,
-        receipt_payment_time: parsed.paymentTime,
+        receipt_transaction_ref: parsed?.transactionRef ?? null,
+        receipt_amount: parsed?.amount ?? null,
+        receipt_payment_time: parsed?.paymentTime ?? null,
         payment_notes: paymentNotes,
       })
       .select()
