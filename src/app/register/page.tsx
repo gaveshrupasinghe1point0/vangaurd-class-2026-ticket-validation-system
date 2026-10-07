@@ -72,26 +72,27 @@ export default function RegisterPage() {
     setLoading(false);
   }
 
-  if (success) {
-    return (
-      <main className="min-h-screen relative flex items-center justify-center px-4 overflow-hidden">
-        {/* Background Video with Overlay */}
-        <div className="absolute inset-0 z-0 fixed overflow-hidden">
-          <video 
-            autoPlay 
-            loop 
-            muted 
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/vanguard-bg-video.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
-        </div>
+  return (
+    <main className={`min-h-screen relative flex ${success ? 'items-center' : 'flex-col items-center py-10'} justify-center px-4 overflow-hidden`}>
+      {/* Background Video with Overlay - Kept mounted to prevent reload delay */}
+      <div className="absolute inset-0 z-0 fixed overflow-hidden">
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/vanguard-bg-video.mp4" type="video/mp4" />
+        </video>
+        <div className={`absolute inset-0 transition-colors duration-500 ${success ? 'bg-black/80 backdrop-blur-sm' : 'bg-[#09090b]/80'}`} />
+      </div>
 
+      {success ? (
+        <>
         <div className="pointer-events-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#d4af37]/10 blur-[120px] z-0" />
         
-        <div className="relative z-10 w-full max-w-md text-center">
+        <div className="relative z-10 w-full max-w-md text-center animate-in fade-in zoom-in duration-500">
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(34,197,94,0.2)]">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-400">
@@ -114,30 +115,13 @@ export default function RegisterPage() {
           </div>
           <p className="text-zinc-400 text-xs font-medium">Questions? Contact the Vanguard 2026 team.</p>
         </div>
-      </main>
-    );
-  }
-
-  return (
-    <main className="min-h-screen relative py-10 px-4 flex flex-col items-center justify-center overflow-hidden">
-      {/* Background Video with Overlay */}
-      <div className="absolute inset-0 z-0 fixed overflow-hidden">
-        <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/vanguard-bg-video.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-[#09090b]/80" />
-      </div>
-      
+        </>
+      ) : (
+        <>
       {/* Ambient glow */}
       <div className="pointer-events-none fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-[#d4af37]/10 blur-[120px] z-0" />
 
-      <div className="relative z-10 w-full max-w-2xl mx-auto px-2 sm:px-0">
+      <div className="relative z-10 w-full max-w-2xl mx-auto px-2 sm:px-0 animate-in fade-in duration-500">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8 mt-4 sm:mt-0">
           <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">VANGUARD</div>
@@ -373,6 +357,8 @@ export default function RegisterPage() {
           </p>
         </div>
       </div>
+      </>
+      )}
 
       {/* Loading Modal */}
       {loading && (
