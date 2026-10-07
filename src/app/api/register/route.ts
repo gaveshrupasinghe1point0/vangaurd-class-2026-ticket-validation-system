@@ -68,26 +68,50 @@ export async function POST(request: Request) {
 
     const arrayBuffer = await receiptFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    let parsed: ParsedReceipt | null = null;
 
-    // Read the receipt:
-    //  - PDFs: fast text extraction first; if it can't find the NIC/amount
-    //    (e.g. a scanned PDF with no text layer), fall back to Gemini
-    //  - Photos: Gemini OCR
-    if (receiptFile.type === 'application/pdf') {
-      try {
-        parsed = await parseReceiptPDF(buffer);
-      } catch (e) {
-        console.error('PDF text extraction failed:', e);
-      }
-      if (!parsed || !parsed.nic || parsed.amount === null) {
-        const ocrText = await ocrReceiptImage(buffer, 'application/pdf');
+    // Determine extension
+    let ext = 'pdf';
+    if (receiptFile.type === 'image/jpeg' || receiptFile.type === 'image/jpg') ext = 'jpg';
+    if (receiptFile.type === 'image/png') ext = 'png';
+    const fileName = `reciepts/${nic}-${Date.now()}.${ext}`;
+
+    // Parallelize OCR and Upload to save time
+    const processOCR = async (): Promise<ParsedReceipt | null> => {
+      let parsed: ParsedReceipt | null = null;
+      if (receiptFile.type === 'application/pdf') {
+        try {
+          parsed = await parseReceiptPDF(buffer);
+        } catch (e) {
+          console.error('PDF text extraction failed:', e);
+        }
+        if (!parsed || !parsed.nic || parsed.amount === null) {
+          const ocrText = await ocrReceiptImage(buffer, 'application/pdf');
+          if (ocrText) parsed = parseReceiptText(ocrText);
+        }
+      } else {
+        const ocrText = await ocrReceiptImage(buffer, receiptFile.type);
         if (ocrText) parsed = parseReceiptText(ocrText);
       }
-    } else {
-      const ocrText = await ocrReceiptImage(buffer, receiptFile.type);
-      if (ocrText) parsed = parseReceiptText(ocrText);
-    }
+      return parsed;
+    };
+
+    const processUpload = async () => {
+      const { error: uploadError } = await adminClient.storage
+        .from('reciepts')
+        .upload(fileName, buffer, { contentType: receiptFile.type, upsert: false });
+      
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError);
+        return { uploadError, receiptUrl: '' };
+      }
+      const { data: urlData } = adminClient.storage.from('reciepts').getPublicUrl(fileName);
+      return { uploadError: null, receiptUrl: urlData.publicUrl };
+    };
+
+    const [parsed, { uploadError, receiptUrl }] = await Promise.all([
+      processOCR(),
+      processUpload()
+    ]);
 
     // Cross-check what's on the receipt against what they typed.
     // Status stays pending_review — the bank SMS is still the source of truth.
@@ -114,27 +138,6 @@ export async function POST(request: Request) {
       paymentNotes = `${checks.join(' · ')}. Awaiting SMS verification.`;
     } else {
       paymentNotes = 'Receipt could not be read automatically — check manually. Awaiting SMS verification.';
-    }
-
-    // Determine extension
-    let ext = 'pdf';
-    if (receiptFile.type === 'image/jpeg' || receiptFile.type === 'image/jpg') ext = 'jpg';
-    if (receiptFile.type === 'image/png') ext = 'png';
-
-    // Upload file to Supabase Storage (bucket named 'reciepts')
-    const fileName = `reciepts/${nic}-${Date.now()}.${ext}`;
-    const { error: uploadError } = await adminClient.storage
-      .from('reciepts')
-      .upload(fileName, buffer, { contentType: receiptFile.type, upsert: false });
-
-    if (uploadError) {
-      console.error('Storage upload error:', uploadError);
-    }
-
-    let receiptUrl = '';
-    if (!uploadError) {
-      const { data: urlData } = adminClient.storage.from('reciepts').getPublicUrl(fileName);
-      receiptUrl = urlData.publicUrl;
     }
 
     // Generate QR token — but QR is only sent after payment confirmed
@@ -203,8 +206,7 @@ export async function POST(request: Request) {
           </div>
         `,
       };
-      // One email per admin — a rejected address can't block the others
-      for (const to of ADMIN_EMAILS) await send(to, adminMail.subject, adminMail.html);
+      // Admin emails and attendee email will be sent in parallel below
 
       // Email 2: Attendee confirmation
       const attendeeMail = {
@@ -244,7 +246,12 @@ export async function POST(request: Request) {
           </div>
         `,
       };
-      await send(email, attendeeMail.subject, attendeeMail.html);
+      
+      // Send all emails in parallel to speed up the response
+      await Promise.all([
+        ...ADMIN_EMAILS.map(to => send(to, adminMail.subject, adminMail.html)),
+        send(email, attendeeMail.subject, attendeeMail.html)
+      ]);
 
     } catch (emailErr) {
       console.error('Email notification failed (non-critical):', emailErr);
