@@ -1,7 +1,14 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Calendar, Clock, MapPin } from 'lucide-react';
 
 export default function LandingPage() {
+  const router = useRouter();
+  const [showWarningModal, setShowWarningModal] = useState(false);
+
   return (
     <main className="relative min-h-screen overflow-hidden flex flex-col">
       {/* Background Video with Overlay */}
@@ -63,12 +70,12 @@ export default function LandingPage() {
 
         {/* Register Button */}
         <div className="mt-8 mb-2">
-          <Link
-            href="/register"
+          <button
+            onClick={() => setShowWarningModal(true)}
             className="inline-block px-8 py-3.5 sm:px-10 sm:py-4 rounded-full bg-[#d4af37] hover:bg-[#f0d060] text-black font-bold text-base sm:text-lg tracking-wider uppercase transition-all shadow-[0_0_40px_rgba(212,175,55,0.4)] hover:shadow-[0_0_60px_rgba(212,175,55,0.6)] active:scale-95"
           >
             Register for Event
-          </Link>
+          </button>
         </div>
 
         {/* Event details — horizontal row on mobile */}
@@ -98,6 +105,46 @@ export default function LandingPage() {
       <footer className="relative z-10 text-center py-6 text-zinc-500 text-[10px] tracking-widest drop-shadow-md bg-gradient-to-t from-black/80 to-transparent">
         VANGUARD 2026 &mdash; ALL RIGHTS RESERVED
       </footer>
+
+      {/* Warning Modal before Registration */}
+      {showWarningModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setShowWarningModal(false)} />
+          <div className="relative bg-zinc-900 border-2 border-red-500 rounded-2xl w-full max-w-md p-6 shadow-[0_0_50px_rgba(239,68,68,0.3)] animate-in fade-in zoom-in duration-200">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
+                <span className="text-3xl">⚠️</span>
+              </div>
+              <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-widest">Important!</h3>
+              <p className="text-red-400 font-bold text-base mb-4 uppercase tracking-wide">Read Before Paying</p>
+              
+              <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6 text-left w-full">
+                <p className="text-zinc-300 text-sm leading-relaxed mb-3">
+                  When transferring the ticket fee to the bank account, you <strong className="text-white">MUST</strong> enter your <strong className="text-white">NIC number</strong> as the bank reference/remark.
+                </p>
+                <p className="text-zinc-400 text-xs">
+                  Your payment will <strong className="text-red-400">NOT</strong> be verified if the reference is missing or incorrect.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 w-full">
+                <button
+                  onClick={() => router.push('/register')}
+                  className="w-full bg-red-600 hover:bg-red-500 text-white font-black py-3.5 rounded-xl transition-all shadow-lg shadow-red-500/20"
+                >
+                  I UNDERSTAND, PROCEED
+                </button>
+                <button
+                  onClick={() => setShowWarningModal(false)}
+                  className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold py-3 rounded-xl transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

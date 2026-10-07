@@ -11,7 +11,6 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ full_name: '', nic: '', phone: '', email: '' });
   const [file, setFile] = useState<File | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   function copyToClipboard(text: string, key: string) {
     navigator.clipboard.writeText(text).then(() => {
@@ -50,11 +49,6 @@ export default function RegisterPage() {
       return;
     }
 
-    setShowConfirmModal(true);
-  }
-
-  async function confirmSubmit() {
-    setShowConfirmModal(false);
     setLoading(true);
     setError('');
 
@@ -63,7 +57,7 @@ export default function RegisterPage() {
     data.append('nic', form.nic.trim());
     data.append('phone', form.phone.trim());
     data.append('email', form.email.trim());
-    if (file) data.append('receipt', file);
+    data.append('receipt', file);
 
     const res = await fetch('/api/register', { method: 'POST', body: data });
     const json = await res.json();
@@ -379,46 +373,6 @@ export default function RegisterPage() {
           </p>
         </div>
       </div>
-
-      {/* Confirmation Modal */}
-      {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setShowConfirmModal(false)} />
-          <div className="relative bg-zinc-900 border-2 border-red-500 rounded-2xl w-full max-w-md p-6 shadow-[0_0_50px_rgba(239,68,68,0.3)] animate-in fade-in zoom-in duration-200">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
-                <span className="text-3xl">⚠️</span>
-              </div>
-              <h3 className="text-2xl font-black text-white mb-2">WAIT!</h3>
-              <p className="text-red-400 font-bold text-lg mb-4 uppercase tracking-wide">Did you set your NIC as the reference?</p>
-              
-              <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6 text-left w-full">
-                <p className="text-zinc-300 text-sm leading-relaxed mb-3">
-                  Your payment <strong className="text-white">CANNOT</strong> be verified if you did not put your NIC number (<strong className="text-white font-mono">{form.nic}</strong>) as the bank transfer reference/remark.
-                </p>
-                <p className="text-zinc-400 text-xs">
-                  If you forgot to do this, your registration will be rejected.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3 w-full">
-                <button
-                  onClick={confirmSubmit}
-                  className="w-full bg-red-600 hover:bg-red-500 text-white font-black py-3.5 rounded-xl transition-all shadow-lg shadow-red-500/20"
-                >
-                  YES, I USED MY NIC AS REFERENCE
-                </button>
-                <button
-                  onClick={() => setShowConfirmModal(false)}
-                  className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold py-3 rounded-xl transition-all"
-                >
-                  No, I need to check / re-do it
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 }
