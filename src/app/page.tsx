@@ -8,6 +8,7 @@ import { Calendar, Clock, MapPin } from 'lucide-react';
 export default function LandingPage() {
   const router = useRouter();
   const [showWarningModal, setShowWarningModal] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   return (
     <main className="relative min-h-screen overflow-hidden flex flex-col">
@@ -129,10 +130,19 @@ export default function LandingPage() {
 
               <div className="flex flex-col gap-3 w-full">
                 <button
-                  onClick={() => router.push('/register')}
-                  className="w-full bg-red-600 hover:bg-red-500 text-white font-black py-3.5 rounded-xl transition-all shadow-lg shadow-red-500/20"
+                  onClick={() => {
+                    setIsNavigating(true);
+                    router.push('/register');
+                  }}
+                  disabled={isNavigating}
+                  className="w-full bg-red-600 hover:bg-red-500 disabled:opacity-50 disabled:cursor-wait text-white font-black py-3.5 rounded-xl transition-all shadow-lg shadow-red-500/20 flex items-center justify-center gap-2"
                 >
-                  I UNDERSTAND, PROCEED
+                  {isNavigating ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      LOADING...
+                    </>
+                  ) : 'I UNDERSTAND, PROCEED'}
                 </button>
                 <button
                   onClick={() => setShowWarningModal(false)}
