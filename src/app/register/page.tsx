@@ -373,6 +373,23 @@ export default function RegisterPage() {
           </p>
         </div>
       </div>
+
+      {/* Loading Modal */}
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+          <div className="relative bg-zinc-900 border border-[#d4af37]/30 rounded-2xl w-full max-w-sm p-8 shadow-[0_0_50px_rgba(212,175,55,0.15)] flex flex-col items-center text-center animate-in fade-in zoom-in duration-200">
+            {/* Spinning Ring */}
+            <div className="w-16 h-16 border-4 border-zinc-800 border-t-[#d4af37] rounded-full animate-spin mb-6" />
+            
+            <h3 className="text-xl font-bold text-white mb-2">Submitting Registration...</h3>
+            <p className="text-[#d4af37] text-sm font-medium mb-3">Please do not close this window</p>
+            <p className="text-zinc-400 text-xs leading-relaxed">
+              We are uploading your receipt and verifying your details. This may take up to 20 seconds.
+            </p>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
