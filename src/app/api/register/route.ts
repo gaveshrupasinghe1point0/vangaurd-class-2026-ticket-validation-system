@@ -172,7 +172,7 @@ export async function POST(request: Request) {
       // domain is verified in Resend. The onboarding@resend.dev test sender can ONLY
       // deliver to the Resend account owner's own email address.
       const FROM = process.env.RESEND_FROM || 'Vanguard 2026 <onboarding@resend.dev>';
-      const ADMIN_EMAILS = ['gimhanarupasinghe516@gmail.com', 'rochanakuvindu85@gmail.com'];
+      const ADMIN_EMAILS = ['gimhanarupasinghe516@gmail.com'];
 
       // Resend's SDK returns { error } instead of throwing — check it so failures are visible in logs
       const send = async (to: string, subject: string, html: string) => {
