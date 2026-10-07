@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
@@ -11,12 +11,19 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ full_name: '', nic: '', phone: '', email: '' });
   const [file, setFile] = useState<File | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (success) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [success]);
+
+  useEffect(() => {
+    if (error && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [error]);
 
   function copyToClipboard(text: string, key: string) {
     navigator.clipboard.writeText(text).then(() => {
@@ -246,7 +253,7 @@ export default function RegisterPage() {
           <h2 className="text-white font-semibold text-base sm:text-lg mb-4 sm:mb-5">Your Details</h2>
 
           {error && (
-            <div className="mb-4 sm:mb-5 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs sm:text-sm">
+            <div ref={errorRef} className="mb-4 sm:mb-5 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs sm:text-sm">
               {error.includes('already registered') ? (
                 <div className="flex flex-col gap-2">
                   <p>{error}</p>
