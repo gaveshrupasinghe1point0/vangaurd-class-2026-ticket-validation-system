@@ -165,14 +165,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to save registration.' }, { status: 500 });
     }
 
-    // Send admin notification email (fire-and-forget — never blocks registration)
+    // Send notification emails (never blocks registration)
     try {
       const resend = new Resend(process.env.RESEND_API_KEY);
+      // Set RESEND_FROM (e.g. "Vanguard 2026 <tickets@vanguardtickets.online>") once the
+      // domain is verified in Resend. The onboarding@resend.dev test sender can ONLY
+      // deliver to the Resend account owner's own email address.
+      const FROM = process.env.RESEND_FROM || 'Vanguard 2026 <onboarding@resend.dev>';
+      const ADMIN_EMAILS = ['gimhanarupasinghe516@gmail.com', 'rochanakuvindu85@gmail.com'];
+
+      // Resend's SDK returns { error } instead of throwing — check it so failures are visible in logs
+      const send = async (to: string, subject: string, html: string) => {
+        const { error } = await resend.emails.send({ from: FROM, to, subject, html });
+        if (error) console.error(`Email to ${to} failed:`, error);
+      };
 
       // Email 1: Admin notification
-      await resend.emails.send({
-        from: 'Vanguard 2026 <onboarding@resend.dev>',
-        to: ['gimhanarupasinghe516@gmail.com', 'rochanakuvindu85@gmail.com'],
+      const adminMail = {
         subject: `🎟 New Registration — ${full_name}`,
         html: `
           <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#fff;border-radius:12px;overflow:hidden;">
@@ -193,12 +202,12 @@ export async function POST(request: Request) {
             </div>
           </div>
         `,
-      });
+      };
+      // One email per admin — a rejected address can't block the others
+      for (const to of ADMIN_EMAILS) await send(to, adminMail.subject, adminMail.html);
 
       // Email 2: Attendee confirmation
-      await resend.emails.send({
-        from: 'Vanguard 2026 <onboarding@resend.dev>',
-        to: email,
+      const attendeeMail = {
         subject: `✅ Registration Received — Vanguard 2026`,
         html: `
           <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#fff;border-radius:12px;overflow:hidden;">
@@ -234,7 +243,8 @@ export async function POST(request: Request) {
             </div>
           </div>
         `,
-      });
+      };
+      await send(email, attendeeMail.subject, attendeeMail.html);
 
     } catch (emailErr) {
       console.error('Email notification failed (non-critical):', emailErr);
