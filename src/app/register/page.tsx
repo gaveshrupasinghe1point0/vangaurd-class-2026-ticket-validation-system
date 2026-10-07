@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
@@ -11,6 +11,12 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ full_name: '', nic: '', phone: '', email: '' });
   const [file, setFile] = useState<File | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (success) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [success]);
 
   function copyToClipboard(text: string, key: string) {
     navigator.clipboard.writeText(text).then(() => {
