@@ -199,6 +199,7 @@ export async function POST(request: Request) {
                 <tr><td style="padding:8px 0;color:#a1a1aa;">WhatsApp</td><td style="padding:8px 0;">${phone}</td></tr>
                 <tr><td style="padding:8px 0;color:#a1a1aa;">Email</td><td style="padding:8px 0;">${email}</td></tr>
                 <tr><td style="padding:8px 0;color:#a1a1aa;">Status</td><td style="padding:8px 0;color:#f59e0b;font-weight:600;">Pending Review</td></tr>
+                <tr><td style="padding:8px 0;color:#a1a1aa;">AI Verdict</td><td style="padding:8px 0;font-size:12px;color:#d4af37;">${paymentNotes}</td></tr>
                 ${receiptUrl ? `<tr><td style="padding:8px 0;color:#a1a1aa;">Receipt</td><td style="padding:8px 0;"><a href="${receiptUrl}" style="color:#d4af37;">View Receipt</a></td></tr>` : ''}
               </table>
               <p style="margin:20px 0 0;font-size:12px;color:#52525b;">Paste the bank SMS into the admin dashboard to verify payment and send the QR ticket.</p>

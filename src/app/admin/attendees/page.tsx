@@ -115,6 +115,21 @@ export default async function AttendeesPage({
                       <div className="flex flex-col items-start gap-2">
                         {/* Payment Status */}
                         {a.payment_status && <PaymentStatusBadge status={a.payment_status} />}
+
+                        {/* AI Verification Notes */}
+                        {a.payment_notes && a.payment_notes !== 'Approved via SMS match' && (
+                          <div className="text-[10px] space-y-0.5 mt-1 max-w-[200px]">
+                            {a.payment_notes.split('·').map((note, i) => {
+                              const isWarn = note.includes('⚠');
+                              const isGood = note.includes('✓');
+                              return (
+                                <div key={i} className={`leading-tight ${isWarn ? 'text-amber-400' : isGood ? 'text-green-400' : 'text-zinc-500'}`}>
+                                  {note.trim().replace('. Awaiting SMS verification.', '')}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                         
                         {/* Entry Status */}
                         {a.qr_used ? (
