@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-server';
 import { parseReceiptPDF, parseReceiptText, type ParsedReceipt } from '@/lib/pdf-parser';
 import { ocrReceiptImage } from '@/lib/image-ocr';
@@ -75,26 +75,6 @@ export async function POST(request: Request) {
     if (receiptFile.type === 'image/png') ext = 'png';
     const fileName = `reciepts/${nic}-${Date.now()}.${ext}`;
 
-    // Parallelize OCR and Upload to save time
-    const processOCR = async (): Promise<ParsedReceipt | null> => {
-      let parsed: ParsedReceipt | null = null;
-      if (receiptFile.type === 'application/pdf') {
-        try {
-          parsed = await parseReceiptPDF(buffer);
-        } catch (e) {
-          console.error('PDF text extraction failed:', e);
-        }
-        if (!parsed || !parsed.nic || parsed.amount === null) {
-          const ocrText = await ocrReceiptImage(buffer, 'application/pdf');
-          if (ocrText) parsed = parseReceiptText(ocrText);
-        }
-      } else {
-        const ocrText = await ocrReceiptImage(buffer, receiptFile.type);
-        if (ocrText) parsed = parseReceiptText(ocrText);
-      }
-      return parsed;
-    };
-
     const processUpload = async () => {
       const { error: uploadError } = await adminClient.storage
         .from('reciepts')
@@ -108,42 +88,15 @@ export async function POST(request: Request) {
       return { uploadError: null, receiptUrl: urlData.publicUrl };
     };
 
-    const [parsed, { uploadError, receiptUrl }] = await Promise.all([
-      processOCR(),
-      processUpload()
-    ]);
-
-    // Cross-check what's on the receipt against what they typed.
-    // Status stays pending_review — the bank SMS is still the source of truth.
-    const paymentStatus = 'pending_review';
-    const registeredNIC = nic.toUpperCase();
-    let paymentNotes = 'Awaiting SMS verification or manual review.';
-
-    if (parsed) {
-      const checks: string[] = [];
-      if (!parsed.nic) {
-        checks.push('⚠ No NIC reference found on receipt');
-      } else if (parsed.nic !== registeredNIC) {
-        checks.push(`⚠ Receipt reference ${parsed.nic} does NOT match registered NIC`);
-      } else {
-        checks.push('✓ Receipt reference matches NIC');
-      }
-      if (parsed.amount === null) {
-        checks.push('⚠ Amount unreadable');
-      } else if (parsed.amount !== 6500) {
-        checks.push(`⚠ Receipt amount LKR ${parsed.amount.toLocaleString()} (expected 6,500)`);
-      } else {
-        checks.push('✓ Amount LKR 6,500');
-      }
-      paymentNotes = `${checks.join(' · ')}. Awaiting SMS verification.`;
-    } else {
-      paymentNotes = 'Receipt could not be read automatically — check manually. Awaiting SMS verification.';
-    }
+    // Only await the upload before returning to the user
+    const { uploadError, receiptUrl } = await processUpload();
 
     // Generate QR token — but QR is only sent after payment confirmed
     const qr_token = crypto.randomUUID();
+    const paymentStatus = 'pending_review';
+    const registeredNIC = nic.toUpperCase();
 
-    // Insert attendee
+    // Insert attendee instantly
     const { data, error: insertError } = await adminClient
       .from('attendees')
       .insert({
@@ -155,10 +108,10 @@ export async function POST(request: Request) {
         qr_used: false,
         payment_status: paymentStatus,
         receipt_url: receiptUrl,
-        receipt_transaction_ref: parsed?.transactionRef ?? null,
-        receipt_amount: parsed?.amount ?? null,
-        receipt_payment_time: parsed?.paymentTime ?? null,
-        payment_notes: paymentNotes,
+        receipt_transaction_ref: null,
+        receipt_amount: null,
+        receipt_payment_time: null,
+        payment_notes: 'AI processing receipt...',
       })
       .select()
       .single();
@@ -168,95 +121,144 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to save registration.' }, { status: 500 });
     }
 
-    // Send notification emails (never blocks registration)
-    try {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      // Set RESEND_FROM (e.g. "Vanguard 2026 <tickets@vanguardtickets.online>") once the
-      // domain is verified in Resend. The onboarding@resend.dev test sender can ONLY
-      // deliver to the Resend account owner's own email address.
-      const FROM = process.env.RESEND_FROM || 'Vanguard 2026 <onboarding@resend.dev>';
-      const ADMIN_EMAILS = ['gimhanarupasinghe516@gmail.com'];
+    // DEFER AI OCR AND EMAILS TO BACKGROUND
+    after(async () => {
+      try {
+        const processOCR = async (): Promise<ParsedReceipt | null> => {
+          let parsed: ParsedReceipt | null = null;
+          if (receiptFile.type === 'application/pdf') {
+            try {
+              parsed = await parseReceiptPDF(buffer);
+            } catch (e) {
+              console.error('PDF text extraction failed:', e);
+            }
+            if (!parsed || !parsed.nic || parsed.amount === null) {
+              const ocrText = await ocrReceiptImage(buffer, 'application/pdf');
+              if (ocrText) parsed = parseReceiptText(ocrText);
+            }
+          } else {
+            const ocrText = await ocrReceiptImage(buffer, receiptFile.type);
+            if (ocrText) parsed = parseReceiptText(ocrText);
+          }
+          return parsed;
+        };
 
-      // Resend's SDK returns { error } instead of throwing — check it so failures are visible in logs
-      const send = async (to: string, subject: string, html: string) => {
-        const { error } = await resend.emails.send({ from: FROM, to, subject, html });
-        if (error) console.error(`Email to ${to} failed:`, error);
-      };
+        const parsed = await processOCR();
+        let paymentNotes = 'Awaiting SMS verification or manual review.';
 
-      // Email 1: Admin notification
-      const adminMail = {
-        subject: `🎟 New Registration — ${full_name}`,
-        html: `
-          <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#fff;border-radius:12px;overflow:hidden;">
-            <div style="background:#d4af37;padding:20px 24px;">
-              <h1 style="margin:0;font-size:20px;color:#000;font-weight:900;letter-spacing:0.1em;">VANGUARD 2026</h1>
-              <p style="margin:4px 0 0;font-size:12px;color:#000;opacity:0.7;">New Attendee Registration</p>
-            </div>
-            <div style="padding:24px;">
-              <table style="width:100%;border-collapse:collapse;font-size:14px;">
-                <tr><td style="padding:8px 0;color:#a1a1aa;width:130px;">Full Name</td><td style="padding:8px 0;font-weight:600;">${full_name}</td></tr>
-                <tr><td style="padding:8px 0;color:#a1a1aa;">NIC</td><td style="padding:8px 0;font-family:monospace;">${nic}</td></tr>
-                <tr><td style="padding:8px 0;color:#a1a1aa;">WhatsApp</td><td style="padding:8px 0;">${phone}</td></tr>
-                <tr><td style="padding:8px 0;color:#a1a1aa;">Email</td><td style="padding:8px 0;">${email}</td></tr>
-                <tr><td style="padding:8px 0;color:#a1a1aa;">Status</td><td style="padding:8px 0;color:#f59e0b;font-weight:600;">Pending Review</td></tr>
-                <tr><td style="padding:8px 0;color:#a1a1aa;">AI Verdict</td><td style="padding:8px 0;font-size:12px;color:#d4af37;">${paymentNotes}</td></tr>
-                ${receiptUrl ? `<tr><td style="padding:8px 0;color:#a1a1aa;">Receipt</td><td style="padding:8px 0;"><a href="${receiptUrl}" style="color:#d4af37;">View Receipt</a></td></tr>` : ''}
-              </table>
-              <p style="margin:20px 0 0;font-size:12px;color:#52525b;">Paste the bank SMS into the admin dashboard to verify payment and send the QR ticket.</p>
-            </div>
-          </div>
-        `,
-      };
-      // Admin emails and attendee email will be sent in parallel below
+        if (parsed) {
+          const checks: string[] = [];
+          if (!parsed.nic) {
+            checks.push('⚠ No NIC reference found on receipt');
+          } else if (parsed.nic !== registeredNIC) {
+            checks.push(`⚠ Receipt reference ${parsed.nic} does NOT match registered NIC`);
+          } else {
+            checks.push('✓ Receipt reference matches NIC');
+          }
+          if (parsed.amount === null) {
+            checks.push('⚠ Amount unreadable');
+          } else if (parsed.amount !== 6500) {
+            checks.push(`⚠ Receipt amount LKR ${parsed.amount.toLocaleString()} (expected 6,500)`);
+          } else {
+            checks.push('✓ Amount LKR 6,500');
+          }
+          paymentNotes = `${checks.join(' · ')}. Awaiting SMS verification.`;
+        } else {
+          paymentNotes = 'Receipt could not be read automatically — check manually. Awaiting SMS verification.';
+        }
 
-      // Email 2: Attendee confirmation
-      const attendeeMail = {
-        subject: `✅ Registration Received — Vanguard 2026`,
-        html: `
-          <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#fff;border-radius:12px;overflow:hidden;">
-            <div style="background:#d4af37;padding:20px 24px;">
-              <h1 style="margin:0;font-size:20px;color:#000;font-weight:900;letter-spacing:0.1em;">VANGUARD 2026</h1>
-              <p style="margin:4px 0 0;font-size:12px;color:#000;opacity:0.7;">Registration Confirmation</p>
-            </div>
-            <div style="padding:24px;">
-              <p style="margin:0 0 16px;font-size:15px;color:#fff;">Hey <strong>${full_name}</strong> 👋</p>
-              <p style="margin:0 0 20px;font-size:14px;color:#a1a1aa;line-height:1.6;">
-                Your registration for <strong style="color:#fff;">Vanguard 2026</strong> has been received! Your payment receipt is currently under review. Once verified, you will receive your personal QR code ticket on WhatsApp.
-              </p>
-              <div style="background:#18181b;border-radius:10px;padding:16px 20px;margin-bottom:20px;">
-                <p style="margin:0 0 10px;font-size:10px;color:#d4af37;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;">Your Details</p>
-                <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                  <tr><td style="padding:6px 0;color:#71717a;width:120px;">Name</td><td style="padding:6px 0;color:#fff;font-weight:600;">${full_name}</td></tr>
-                  <tr><td style="padding:6px 0;color:#71717a;">NIC</td><td style="padding:6px 0;color:#fff;font-family:monospace;">${nic}</td></tr>
-                  <tr><td style="padding:6px 0;color:#71717a;">WhatsApp</td><td style="padding:6px 0;color:#fff;">${phone}</td></tr>
-                </table>
+        // Update DB with OCR results
+        await adminClient
+          .from('attendees')
+          .update({
+            receipt_transaction_ref: parsed?.transactionRef ?? null,
+            receipt_amount: parsed?.amount ?? null,
+            receipt_payment_time: parsed?.paymentTime ?? null,
+            payment_notes: paymentNotes,
+          })
+          .eq('id', data.id);
+
+        // Send Emails
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const FROM = process.env.RESEND_FROM || 'Vanguard 2026 <onboarding@resend.dev>';
+        const ADMIN_EMAILS = ['gimhanarupasinghe516@gmail.com'];
+
+        const send = async (to: string, subject: string, html: string) => {
+          const { error } = await resend.emails.send({ from: FROM, to, subject, html });
+          if (error) console.error(`Email to ${to} failed:`, error);
+        };
+
+        const adminMail = {
+          subject: `🎟 New Registration — ${full_name}`,
+          html: `
+            <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#fff;border-radius:12px;overflow:hidden;">
+              <div style="background:#d4af37;padding:20px 24px;">
+                <h1 style="margin:0;font-size:20px;color:#000;font-weight:900;letter-spacing:0.1em;">VANGUARD 2026</h1>
+                <p style="margin:4px 0 0;font-size:12px;color:#000;opacity:0.7;">New Attendee Registration</p>
               </div>
-              <div style="background:#18181b;border-radius:10px;padding:16px 20px;margin-bottom:24px;">
-                <p style="margin:0 0 10px;font-size:10px;color:#d4af37;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;">Event Details</p>
-                <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                  <tr><td style="padding:6px 0;color:#71717a;width:120px;">Date</td><td style="padding:6px 0;color:#fff;">24th October 2026</td></tr>
-                  <tr><td style="padding:6px 0;color:#71717a;">Time</td><td style="padding:6px 0;color:#fff;">6:00 PM – 11:00 PM</td></tr>
-                  <tr><td style="padding:6px 0;color:#71717a;">Venue</td><td style="padding:6px 0;color:#fff;">Oak Ray Gatambe</td></tr>
-                  <tr><td style="padding:6px 0;color:#71717a;">Dress Code</td><td style="padding:6px 0;color:#fff;">Full Black, Smart Casual</td></tr>
+              <div style="padding:24px;">
+                <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                  <tr><td style="padding:8px 0;color:#a1a1aa;width:130px;">Full Name</td><td style="padding:8px 0;font-weight:600;">${full_name}</td></tr>
+                  <tr><td style="padding:8px 0;color:#a1a1aa;">NIC</td><td style="padding:8px 0;font-family:monospace;">${nic}</td></tr>
+                  <tr><td style="padding:8px 0;color:#a1a1aa;">WhatsApp</td><td style="padding:8px 0;">${phone}</td></tr>
+                  <tr><td style="padding:8px 0;color:#a1a1aa;">Email</td><td style="padding:8px 0;">${email}</td></tr>
+                  <tr><td style="padding:8px 0;color:#a1a1aa;">Status</td><td style="padding:8px 0;color:#f59e0b;font-weight:600;">Pending Review</td></tr>
+                  <tr><td style="padding:8px 0;color:#a1a1aa;">AI Verdict</td><td style="padding:8px 0;font-size:12px;color:#d4af37;">${paymentNotes}</td></tr>
+                  ${receiptUrl ? `<tr><td style="padding:8px 0;color:#a1a1aa;">Receipt</td><td style="padding:8px 0;"><a href="${receiptUrl}" style="color:#d4af37;">View Receipt</a></td></tr>` : ''}
                 </table>
+                <p style="margin:20px 0 0;font-size:12px;color:#52525b;">Paste the bank SMS into the admin dashboard to verify payment and send the QR ticket.</p>
               </div>
-              <p style="margin:0;font-size:12px;color:#52525b;line-height:1.6;">
-                Need help? WhatsApp us at <strong style="color:#a1a1aa;">0755494649</strong> (WhatsApp only).
-              </p>
             </div>
-          </div>
-        `,
-      };
-      
-      // Send all emails in parallel to speed up the response
-      await Promise.all([
-        ...ADMIN_EMAILS.map(to => send(to, adminMail.subject, adminMail.html)),
-        send(email, attendeeMail.subject, attendeeMail.html)
-      ]);
+          `,
+        };
 
-    } catch (emailErr) {
-      console.error('Email notification failed (non-critical):', emailErr);
-    }
+        const attendeeMail = {
+          subject: `✅ Registration Received — Vanguard 2026`,
+          html: `
+            <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#fff;border-radius:12px;overflow:hidden;">
+              <div style="background:#d4af37;padding:20px 24px;">
+                <h1 style="margin:0;font-size:20px;color:#000;font-weight:900;letter-spacing:0.1em;">VANGUARD 2026</h1>
+                <p style="margin:4px 0 0;font-size:12px;color:#000;opacity:0.7;">Registration Confirmation</p>
+              </div>
+              <div style="padding:24px;">
+                <p style="margin:0 0 16px;font-size:15px;color:#fff;">Hey <strong>${full_name}</strong> 👋</p>
+                <p style="margin:0 0 20px;font-size:14px;color:#a1a1aa;line-height:1.6;">
+                  Your registration for <strong style="color:#fff;">Vanguard 2026</strong> has been received! Your payment receipt is currently under review. Once verified, you will receive your personal QR code ticket on WhatsApp.
+                </p>
+                <div style="background:#18181b;border-radius:10px;padding:16px 20px;margin-bottom:20px;">
+                  <p style="margin:0 0 10px;font-size:10px;color:#d4af37;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;">Your Details</p>
+                  <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <tr><td style="padding:6px 0;color:#71717a;width:120px;">Name</td><td style="padding:6px 0;color:#fff;font-weight:600;">${full_name}</td></tr>
+                    <tr><td style="padding:6px 0;color:#71717a;">NIC</td><td style="padding:6px 0;color:#fff;font-family:monospace;">${nic}</td></tr>
+                    <tr><td style="padding:6px 0;color:#71717a;">WhatsApp</td><td style="padding:6px 0;color:#fff;">${phone}</td></tr>
+                  </table>
+                </div>
+                <div style="background:#18181b;border-radius:10px;padding:16px 20px;margin-bottom:24px;">
+                  <p style="margin:0 0 10px;font-size:10px;color:#d4af37;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;">Event Details</p>
+                  <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <tr><td style="padding:6px 0;color:#71717a;width:120px;">Date</td><td style="padding:6px 0;color:#fff;">24th October 2026</td></tr>
+                    <tr><td style="padding:6px 0;color:#71717a;">Time</td><td style="padding:6px 0;color:#fff;">6:00 PM – 11:00 PM</td></tr>
+                    <tr><td style="padding:6px 0;color:#71717a;">Venue</td><td style="padding:6px 0;color:#fff;">Oak Ray Gatambe</td></tr>
+                    <tr><td style="padding:6px 0;color:#71717a;">Dress Code</td><td style="padding:6px 0;color:#fff;">Full Black, Smart Casual</td></tr>
+                  </table>
+                </div>
+                <p style="margin:0;font-size:12px;color:#52525b;line-height:1.6;">
+                  Need help? WhatsApp us at <strong style="color:#a1a1aa;">0755494649</strong> (WhatsApp only).
+                </p>
+              </div>
+            </div>
+          `,
+        };
+
+        // Send all emails in parallel
+        await Promise.all([
+          ...ADMIN_EMAILS.map(to => send(to, adminMail.subject, adminMail.html)),
+          send(email, attendeeMail.subject, attendeeMail.html)
+        ]);
+      } catch (err) {
+        console.error('Background task failed:', err);
+      }
+    });
 
     return NextResponse.json({ success: true, id: data.id, paymentStatus }, { status: 201 });
   } catch (err) {
@@ -264,4 +266,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unexpected error. Please try again.' }, { status: 500 });
   }
 }
-

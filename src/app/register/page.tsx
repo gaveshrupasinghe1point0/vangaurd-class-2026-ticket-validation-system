@@ -384,7 +384,7 @@ export default function RegisterPage() {
             <h3 className="text-xl font-bold text-white mb-2">Submitting Registration...</h3>
             <p className="text-[#d4af37] text-sm font-medium mb-3">Please do not close this window</p>
             <p className="text-zinc-400 text-xs leading-relaxed">
-              We are uploading your receipt and verifying your details. This may take up to 20 seconds.
+              We are uploading your receipt and securing your spot. This should only take a few seconds.
             </p>
           </div>
         </div>
