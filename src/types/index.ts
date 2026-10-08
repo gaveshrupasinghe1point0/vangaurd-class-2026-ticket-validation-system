@@ -31,6 +31,7 @@ export interface Attendee {
   payment_verified_at?: string | null;
   payment_notes?: string | null;
   is_prefect?: boolean;
+  qr_sent?: boolean;
 }
 
 export interface ScanResult {

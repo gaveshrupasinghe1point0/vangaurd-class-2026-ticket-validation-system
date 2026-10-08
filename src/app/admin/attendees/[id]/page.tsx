@@ -8,6 +8,7 @@ import ResetEntryButton from '@/components/ResetEntryButton';
 import DeleteAttendeeButton from '@/components/DeleteAttendeeButton';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import TogglePrefectButton from '@/components/TogglePrefectButton';
+import ToggleQRSentButton from '@/components/ToggleQRSentButton';
 
 export default async function AttendeeDetailPage({
   params,
@@ -166,10 +167,12 @@ export default async function AttendeeDetailPage({
               attendeeName={a.full_name}
               isUsed={a.qr_used}
             />
-            <WhatsAppButton phone={a.phone} name={a.full_name} token={a.qr_token} />
-            <p className="text-zinc-600 text-xs text-center mt-2 leading-relaxed">
-              Send this QR code to the attendee via WhatsApp or email. Each
-              code can only be scanned once.
+            <WhatsAppButton attendeeId={a.id} phone={a.phone} name={a.full_name} token={a.qr_token} autoMarkSent />
+            <div className="mt-4">
+              <ToggleQRSentButton attendeeId={a.id} isSent={!!a.qr_sent} />
+            </div>
+            <p className="text-zinc-600 text-xs text-center mt-3 leading-relaxed">
+              Send this QR code to the attendee via WhatsApp. Clicking the button above will automatically mark it as sent.
             </p>
           </div>
         </div>

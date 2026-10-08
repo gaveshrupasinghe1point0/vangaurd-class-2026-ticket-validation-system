@@ -1,19 +1,35 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function WhatsAppButton({
+  attendeeId,
   phone,
   name,
   token,
   iconOnly,
+  autoMarkSent = false,
 }: {
+  attendeeId?: string;
   phone: string;
   name: string;
   token: string;
   iconOnly?: boolean;
+  autoMarkSent?: boolean;
 }) {
   const [origin, setOrigin] = useState('https://vanguardtickets.online');
+  const router = useRouter();
+
+  const handleClick = () => {
+    if (autoMarkSent && attendeeId) {
+      fetch(`/api/attendees/${attendeeId}/toggle-qr-sent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qr_sent: true })
+      }).then(() => router.refresh());
+    }
+  };
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -45,6 +61,7 @@ export default function WhatsAppButton({
         href={waUrl}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={handleClick}
         title={`Send WhatsApp to ${name}`}
         className="p-1.5 rounded-lg bg-zinc-800/50 hover:bg-green-500/20 text-zinc-400 hover:text-green-400 border border-transparent hover:border-green-500/30 transition-all"
       >
@@ -61,6 +78,7 @@ export default function WhatsAppButton({
       href={waUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={handleClick}
       className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-green-500/20 bg-green-500/5 text-green-400 hover:bg-green-500/10 hover:border-green-500/40 transition-all text-sm font-medium"
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
