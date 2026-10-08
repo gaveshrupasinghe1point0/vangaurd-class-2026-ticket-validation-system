@@ -7,6 +7,7 @@ import QRDisplay from '@/components/QRDisplay';
 import ResetEntryButton from '@/components/ResetEntryButton';
 import DeleteAttendeeButton from '@/components/DeleteAttendeeButton';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import TogglePrefectButton from '@/components/TogglePrefectButton';
 
 export default async function AttendeeDetailPage({
   params,
@@ -130,6 +131,17 @@ export default async function AttendeeDetailPage({
               </div>
             </div>
           )}
+          
+          {/* Prefect Controls */}
+          <div className="bg-purple-950/20 border border-purple-500/20 rounded-2xl p-6 mt-6">
+            <h2 className="text-purple-400 font-semibold text-sm mb-2 uppercase tracking-wider">
+              Prefect Settings
+            </h2>
+            <p className="text-zinc-500 text-xs leading-relaxed mb-4">
+              Toggle this attendee's status as a Vanguard Prefect. Prefects have a discounted expected payment of LKR 4,000.
+            </p>
+            <TogglePrefectButton attendeeId={a.id} isPrefect={!!a.is_prefect} />
+          </div>
 
           {/* Danger Zone */}
           <div className="bg-red-950/20 border border-red-500/20 rounded-2xl p-6 mt-6">

@@ -6,6 +6,7 @@ import ResetEntryButton from '@/components/ResetEntryButton';
 import DeleteAttendeeButton from '@/components/DeleteAttendeeButton';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import PaymentStatusBadge from '@/components/PaymentStatusBadge';
+import TogglePrefectButton from '@/components/TogglePrefectButton';
 
 export default async function AttendeesPage({
   searchParams,
@@ -101,6 +102,13 @@ export default async function AttendeesPage({
                       >
                         {a.full_name}
                       </Link>
+                      {a.is_prefect && (
+                        <div className="mt-1">
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-400">
+                            Prefect
+                          </span>
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-zinc-400 text-sm font-mono">
                       {a.nic}
@@ -150,6 +158,7 @@ export default async function AttendeesPage({
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <TogglePrefectButton attendeeId={a.id} isPrefect={!!a.is_prefect} iconOnly />
                         <WhatsAppButton phone={a.phone} name={a.full_name} token={a.qr_token} iconOnly />
                         <Link
                           href={`/admin/attendees/${a.id}`}

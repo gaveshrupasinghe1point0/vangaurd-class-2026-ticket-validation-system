@@ -30,6 +30,7 @@ export interface Attendee {
   receipt_payment_time?: string | null;
   payment_verified_at?: string | null;
   payment_notes?: string | null;
+  is_prefect?: boolean;
 }
 
 export interface ScanResult {

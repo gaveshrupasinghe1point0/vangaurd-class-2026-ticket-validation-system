@@ -7,10 +7,12 @@ export default async function DashboardPage() {
 
   const [
     { count: totalAttendees },
+    { count: prefectCount },
     { count: checkedIn },
     { count: totalSentinels },
   ] = await Promise.all([
     supabase.from('attendees').select('*', { count: 'exact', head: true }),
+    supabase.from('attendees').select('*', { count: 'exact', head: true }).eq('is_prefect', true),
     supabase
       .from('attendees')
       .select('*', { count: 'exact', head: true })
@@ -21,13 +23,20 @@ export default async function DashboardPage() {
       .eq('role', 'sentinel'),
   ]);
 
+  const pCount = prefectCount ?? 0;
+  const rCount = (totalAttendees ?? 0) - pCount;
+  
   const pending = (totalAttendees ?? 0) - (checkedIn ?? 0);
-  const totalIncome = (totalAttendees ?? 0) * 6500;
+  
+  const prefectIncome = pCount * 4000;
+  const regularIncome = rCount * 6500;
+  const totalIncome = prefectIncome + regularIncome;
 
   const stats = [
     {
       label: 'Total Attendees',
       value: totalAttendees ?? 0,
+      subtext: `${rCount} Regular | ${pCount} Prefects`,
       icon: Users,
       color: 'text-[#d4af37]',
       bg: 'bg-[#d4af37]/10',
@@ -52,6 +61,7 @@ export default async function DashboardPage() {
     {
       label: 'Total Income',
       value: `LKR ${totalIncome.toLocaleString()}`,
+      subtext: `Reg: ${regularIncome.toLocaleString()} | Pre: ${prefectIncome.toLocaleString()}`,
       icon: Wallet,
       color: 'text-emerald-400',
       bg: 'bg-emerald-500/10',
@@ -87,7 +97,7 @@ export default async function DashboardPage() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-        {stats.map(({ label, value, icon: Icon, color, bg, border }) => (
+        {stats.map(({ label, value, subtext, icon: Icon, color, bg, border }) => (
           <div
             key={label}
             className={`rounded-2xl border ${border} ${bg} p-5 flex flex-col justify-between`}
@@ -98,6 +108,7 @@ export default async function DashboardPage() {
             <div>
               <div className="text-2xl xl:text-3xl font-black text-white truncate">{value}</div>
               <div className="text-zinc-500 text-sm mt-1">{label}</div>
+              {subtext && <div className="text-zinc-400/80 text-[10px] mt-1.5 font-medium tracking-wide uppercase">{subtext}</div>}
             </div>
           </div>
         ))}
