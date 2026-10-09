@@ -3,6 +3,54 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
+// Utility to compress images on the client side before upload
+const compressImage = async (file: File): Promise<File> => {
+  if (!file.type.startsWith('image/')) return file;
+  
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return resolve(file);
+
+        // Max 1200px on longest edge
+        const MAX_SIZE = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height && width > MAX_SIZE) {
+          height *= MAX_SIZE / width;
+          width = MAX_SIZE;
+        } else if (height > MAX_SIZE) {
+          width *= MAX_SIZE / height;
+          height = MAX_SIZE;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob((blob) => {
+          if (!blob) return resolve(file);
+          
+          const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
+            type: 'image/jpeg',
+            lastModified: Date.now(),
+          });
+          resolve(compressedFile);
+        }, 'image/jpeg', 0.7); // 70% quality JPEG
+      };
+      img.onerror = () => resolve(file);
+    };
+    reader.onerror = () => resolve(file);
+  });
+};
+
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -65,12 +113,19 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
 
+    let finalFile = file;
+    try {
+      finalFile = await compressImage(file);
+    } catch (e) {
+      console.warn("Compression failed, using original", e);
+    }
+
     const data = new FormData();
     data.append('full_name', form.full_name.trim());
     data.append('nic', form.nic.trim());
     data.append('phone', form.phone.trim());
     data.append('email', form.email.trim());
-    data.append('receipt', file);
+    data.append('receipt', finalFile);
 
     const res = await fetch('/api/register', { method: 'POST', body: data });
     const json = await res.json();
