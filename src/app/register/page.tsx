@@ -285,7 +285,7 @@ export default function RegisterPage() {
           </div>
 
           <ol className="space-y-4 sm:space-y-3 text-xs sm:text-sm text-zinc-300 list-decimal list-inside">
-            <li>Transfer <strong className="text-white">LKR 6,500.00</strong> to the account above.</li>
+            <li>Transfer <strong className="text-white">LKR 7,000.00</strong> to the account above.</li>
             <li>
               {/* Highlighted reference step */}
               <div className="mt-2 bg-amber-500/10 border border-amber-500/40 rounded-xl p-3 sm:p-4 -ml-4">
