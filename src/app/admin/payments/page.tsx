@@ -4,6 +4,7 @@ import PaymentStatusBadge from '@/components/PaymentStatusBadge';
 import SMSMatchPanel from '@/components/SMSMatchPanel';
 import ManualPaymentButton from '@/components/ManualPaymentButton';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import TicketAmountSelector from '@/components/TicketAmountSelector';
 
 const TABS = ['all', 'pending_review', 'suspicious', 'paid', 'not_paid'] as const;
 type Tab = typeof TABS[number];
@@ -28,7 +29,7 @@ export default async function PaymentsPage({
 
   let query = adminClient
     .from('attendees')
-    .select('id, full_name, nic, phone, email, payment_status, receipt_url, receipt_amount, receipt_payment_time, receipt_transaction_ref, payment_notes, payment_verified_at, qr_token, created_at')
+    .select('id, full_name, nic, phone, email, payment_status, receipt_url, receipt_amount, receipt_payment_time, receipt_transaction_ref, payment_notes, payment_verified_at, qr_token, created_at, is_prefect')
     .order('created_at', { ascending: false });
 
   if (tab !== 'all') query = query.eq('payment_status', tab);
@@ -84,7 +85,7 @@ export default async function PaymentsPage({
                 <tr className="border-b border-zinc-800">
                   <th className="px-5 py-4 text-left text-zinc-500 font-medium">Attendee</th>
                   <th className="px-5 py-4 text-left text-zinc-500 font-medium">NIC</th>
-                  <th className="px-5 py-4 text-left text-zinc-500 font-medium">Amount</th>
+                  <th className="px-5 py-4 text-left text-zinc-500 font-medium">Ticket / Amount</th>
                   <th className="px-5 py-4 text-left text-zinc-500 font-medium">Payment Time</th>
                   <th className="px-5 py-4 text-left text-zinc-500 font-medium">Status</th>
                   <th className="px-5 py-4 text-left text-zinc-500 font-medium">Receipt</th>
@@ -99,8 +100,12 @@ export default async function PaymentsPage({
                       <div className="text-zinc-500 text-xs">{a.email}</div>
                     </td>
                     <td className="px-5 py-4 text-zinc-300 font-mono text-xs">{a.nic}</td>
-                    <td className="px-5 py-4 text-zinc-300">
-                      {a.receipt_amount ? `LKR ${Number(a.receipt_amount).toLocaleString()}` : '—'}
+                    <td className="px-5 py-4">
+                      <TicketAmountSelector
+                        attendeeId={a.id}
+                        currentAmount={a.receipt_amount}
+                        isPrefect={a.is_prefect}
+                      />
                     </td>
                     <td className="px-5 py-4 text-zinc-400 text-xs">
                       {a.receipt_payment_time || '—'}

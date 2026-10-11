@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase-server';
-import { Users, UserCheck, Clock, Shield, Wallet } from 'lucide-react';
+import { Users, UserCheck, Clock, Shield, Wallet, Banknote } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function DashboardPage() {
@@ -10,6 +10,7 @@ export default async function DashboardPage() {
     { count: prefectCount },
     { count: checkedIn },
     { count: totalSentinels },
+    { count: count7000 },
   ] = await Promise.all([
     supabase.from('attendees').select('*', { count: 'exact', head: true }),
     supabase.from('attendees').select('*', { count: 'exact', head: true }).eq('is_prefect', true),
@@ -21,22 +22,29 @@ export default async function DashboardPage() {
       .from('profiles')
       .select('*', { count: 'exact', head: true })
       .eq('role', 'sentinel'),
+    supabase
+      .from('attendees')
+      .select('*', { count: 'exact', head: true })
+      .eq('receipt_amount', 7000)
+      .eq('is_prefect', false),
   ]);
 
   const pCount = prefectCount ?? 0;
-  const rCount = (totalAttendees ?? 0) - pCount;
+  const c7000 = count7000 ?? 0;
+  const c6500 = Math.max(0, (totalAttendees ?? 0) - pCount - c7000);
   
   const pending = (totalAttendees ?? 0) - (checkedIn ?? 0);
   
   const prefectIncome = pCount * 4000;
-  const regularIncome = rCount * 6500;
-  const totalIncome = prefectIncome + regularIncome;
+  const regularIncome = c6500 * 6500;
+  const currentTotalIncome = prefectIncome + regularIncome;
+  const income7000 = c7000 * 7000;
 
   const stats = [
     {
       label: 'Total Attendees',
       value: totalAttendees ?? 0,
-      subtext: `${rCount} Regular | ${pCount} Prefects`,
+      subtext: `${(totalAttendees ?? 0) - pCount} Regular | ${pCount} Prefects`,
       icon: Users,
       color: 'text-[#d4af37]',
       bg: 'bg-[#d4af37]/10',
@@ -60,12 +68,21 @@ export default async function DashboardPage() {
     },
     {
       label: 'Total Income',
-      value: `LKR ${totalIncome.toLocaleString()}`,
+      value: `LKR ${currentTotalIncome.toLocaleString()}`,
       subtext: `Reg: ${regularIncome.toLocaleString()} | Pre: ${prefectIncome.toLocaleString()}`,
       icon: Wallet,
       color: 'text-emerald-400',
       bg: 'bg-emerald-500/10',
       border: 'border-emerald-500/20',
+    },
+    {
+      label: '7,000 Tickets Income',
+      value: `LKR ${income7000.toLocaleString()}`,
+      subtext: `${c7000} Tickets @ LKR 7,000`,
+      icon: Banknote,
+      color: 'text-amber-400',
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-500/20',
     },
     {
       label: 'Sentinels',
@@ -96,7 +113,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         {stats.map(({ label, value, subtext, icon: Icon, color, bg, border }) => (
           <div
             key={label}
