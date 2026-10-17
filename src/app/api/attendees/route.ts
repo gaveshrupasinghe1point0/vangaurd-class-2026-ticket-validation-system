@@ -139,7 +139,7 @@ export async function POST(request: Request) {
                     </tr>
                     <tr>
                       <td style="color:#555;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Dress Code</td>
-                      <td style="color:#fff;font-size:14px;font-weight:bold;">Full Black &mdash; Smart Casual</td>
+                      <td style="color:#fff;font-size:14px;font-weight:bold;">Smart Casual, Full Black with Blazer</td>
                     </tr>
                   </table>
                 </td>
@@ -195,7 +195,7 @@ EVENT DETAILS
 Date: 24th October 2026
 Time: 6:00 PM to 11:00 PM
 Venue: Oak Ray Gatambe
-Dress Code: Full Black, Smart Casual
+Dress Code: Smart Casual, Full Black with Blazer
 
 GROUND RULES
 - Your QR code is personal. Do not share it. It can only be scanned once.

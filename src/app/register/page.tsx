@@ -204,7 +204,7 @@ export default function RegisterPage() {
             <div className="flex justify-between sm:block border-b border-white/5 sm:border-0 pb-2 sm:pb-0"><p className="text-zinc-400 text-xs sm:mb-1">Date</p><p className="text-white font-medium text-right sm:text-left text-xs sm:text-sm">24th Oct 2026</p></div>
             <div className="flex justify-between sm:block border-b border-white/5 sm:border-0 pb-2 sm:pb-0"><p className="text-zinc-400 text-xs sm:mb-1">Time</p><p className="text-white font-medium text-right sm:text-left text-xs sm:text-sm">6:00 PM – 11:00 PM</p></div>
             <div className="flex justify-between sm:block border-b border-white/5 sm:border-0 pb-2 sm:pb-0"><p className="text-zinc-400 text-xs sm:mb-1">Venue</p><p className="text-white font-medium text-right sm:text-left text-xs sm:text-sm">Oak Ray Gatambe</p></div>
-            <div className="flex justify-between sm:block"><p className="text-zinc-400 text-xs sm:mb-1">Dress Code</p><p className="text-white font-medium text-right sm:text-left text-xs sm:text-sm">Full Black, Smart Casual</p></div>
+            <div className="flex justify-between sm:block"><p className="text-zinc-400 text-xs sm:mb-1">Dress Code</p><p className="text-white font-medium text-right sm:text-left text-xs sm:text-sm">Smart Casual, Full Black with Blazer</p></div>
           </div>
         </div>
 

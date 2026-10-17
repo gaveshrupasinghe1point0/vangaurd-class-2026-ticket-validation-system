@@ -67,7 +67,7 @@ export default function LoginPage() {
               <div><p className="text-zinc-500 text-xs mb-0.5">Date</p><p className="text-white font-medium">24th October 2026</p></div>
               <div><p className="text-zinc-500 text-xs mb-0.5">Time</p><p className="text-white font-medium">6:00 PM – 11:00 PM</p></div>
               <div><p className="text-zinc-500 text-xs mb-0.5">Venue</p><p className="text-white font-medium">Oak Ray Gatambe</p></div>
-              <div><p className="text-zinc-500 text-xs mb-0.5">Dress Code</p><p className="text-white font-medium">Full Black, Smart Casual</p></div>
+              <div><p className="text-zinc-500 text-xs mb-0.5">Dress Code</p><p className="text-white font-medium">Smart Casual, Full Black with Blazer</p></div>
             </div>
           </div>
 

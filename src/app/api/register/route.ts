@@ -239,7 +239,7 @@ export async function POST(request: Request) {
                     <tr><td style="padding:6px 0;color:#71717a;width:120px;">Date</td><td style="padding:6px 0;color:#fff;">24th October 2026</td></tr>
                     <tr><td style="padding:6px 0;color:#71717a;">Time</td><td style="padding:6px 0;color:#fff;">6:00 PM – 11:00 PM</td></tr>
                     <tr><td style="padding:6px 0;color:#71717a;">Venue</td><td style="padding:6px 0;color:#fff;">Oak Ray Gatambe</td></tr>
-                    <tr><td style="padding:6px 0;color:#71717a;">Dress Code</td><td style="padding:6px 0;color:#fff;">Full Black, Smart Casual</td></tr>
+                    <tr><td style="padding:6px 0;color:#71717a;">Dress Code</td><td style="padding:6px 0;color:#fff;">Smart Casual, Full Black with Blazer</td></tr>
                   </table>
                 </div>
                 <p style="margin:0;font-size:12px;color:#52525b;line-height:1.6;">

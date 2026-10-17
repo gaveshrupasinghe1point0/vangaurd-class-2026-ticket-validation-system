@@ -88,7 +88,7 @@ export default async function PublicTicketPage({
               </div>
               <div>
                 <p className="text-zinc-500 text-[9px] font-bold uppercase tracking-widest mb-1">Dress Code</p>
-                <p className="text-white font-medium text-xs sm:text-sm">Full Black</p>
+                <p className="text-white font-medium text-xs sm:text-sm">Smart Casual, Full Black with Blazer</p>
               </div>
             </div>
           </div>
