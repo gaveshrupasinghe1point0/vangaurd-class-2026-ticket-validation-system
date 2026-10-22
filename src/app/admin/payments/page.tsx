@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase-server';
 import Link from 'next/link';
+import { Search } from 'lucide-react';
 import PaymentStatusBadge from '@/components/PaymentStatusBadge';
 import SMSMatchPanel from '@/components/SMSMatchPanel';
 import ManualPaymentButton from '@/components/ManualPaymentButton';
@@ -20,9 +21,9 @@ const TAB_LABELS: Record<Tab, string> = {
 export default async function PaymentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; q?: string }>;
 }) {
-  const { tab: rawTab } = await searchParams;
+  const { tab: rawTab, q } = await searchParams;
   const tab: Tab = TABS.includes(rawTab as Tab) ? (rawTab as Tab) : 'all';
 
   const adminClient = createAdminClient();
@@ -33,6 +34,12 @@ export default async function PaymentsPage({
     .order('created_at', { ascending: false });
 
   if (tab !== 'all') query = query.eq('payment_status', tab);
+
+  if (q) {
+    query = query.or(
+      `full_name.ilike.%${q}%,nic.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`
+    );
+  }
 
   const { data: attendees } = await query;
 
@@ -57,12 +64,27 @@ export default async function PaymentsPage({
       {/* SMS Match Panel */}
       <SMSMatchPanel />
 
+      {/* Search */}
+      <form className="relative mb-6">
+        <input type="hidden" name="tab" value={tab} />
+        <Search
+          size={16}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
+        />
+        <input
+          name="q"
+          defaultValue={q}
+          placeholder="Search by name, NIC, email or phone…"
+          className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-[#d4af37]/50 transition-all text-sm"
+        />
+      </form>
+
       {/* Tabs */}
       <div className="flex gap-2 flex-wrap mb-6">
         {TABS.map(t => (
           <Link
             key={t}
-            href={`/admin/payments?tab=${t}`}
+            href={`/admin/payments?tab=${t}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
             className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
               tab === t
                 ? 'bg-[#d4af37] text-black border-[#d4af37]'
@@ -77,7 +99,9 @@ export default async function PaymentsPage({
       {/* Table */}
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900 overflow-hidden">
         {!attendees || attendees.length === 0 ? (
-          <div className="px-6 py-16 text-center text-zinc-600 text-sm">No registrations found.</div>
+          <div className="px-6 py-16 text-center text-zinc-600 text-sm">
+            {q ? `No results for "${q}".` : 'No registrations found.'}
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
