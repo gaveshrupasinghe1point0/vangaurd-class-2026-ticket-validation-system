@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Calendar, Clock, MapPin } from 'lucide-react';
+import { Calendar, Clock, MapPin, Tv } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -34,18 +34,28 @@ export default function LandingPage() {
         <div className="text-[#d4af37] font-bold tracking-[0.3em] text-sm uppercase">
           VG&apos;26
         </div>
-        <Link
-          href="/login"
-          className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#d4af37]/40 bg-black/30 backdrop-blur-md text-[#d4af37] text-xs font-medium hover:bg-[#d4af37]/10 transition-all duration-200"
-        >
-          Staff Login →
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/video"
+            target="_blank"
+            className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-amber-500/60 bg-amber-500/15 text-amber-300 text-xs font-semibold hover:bg-amber-500/25 transition-all shadow-[0_0_15px_rgba(245,158,11,0.25)]"
+          >
+            <Tv size={14} />
+            <span>Video Page</span>
+          </Link>
+          <Link
+            href="/login"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#d4af37]/40 bg-black/30 backdrop-blur-md text-[#d4af37] text-xs font-medium hover:bg-[#d4af37]/10 transition-all duration-200"
+          >
+            Staff Login →
+          </Link>
+        </div>
       </nav>
 
       {/* Hero */}
       <section className="relative z-10 flex flex-col items-center justify-center flex-1 text-center px-5 pb-8">
-        {/* Header Badge */}
-        <div className="mb-5 inline-flex items-center px-4 py-1.5 rounded-full border border-[#d4af37]/30 bg-[#d4af37]/10 backdrop-blur-md text-[#d4af37] text-[10px] sm:text-sm font-semibold tracking-widest uppercase shadow-[0_0_20px_rgba(212,175,55,0.1)] whitespace-nowrap">
+        {/* Header Badge — Kingswood College Class of 2026 (made bigger) */}
+        <div className="mb-5 inline-flex items-center px-5 py-2 rounded-full border border-[#d4af37]/40 bg-[#d4af37]/15 backdrop-blur-md text-[#d4af37] text-xs sm:text-base font-bold tracking-widest uppercase shadow-[0_0_25px_rgba(212,175,55,0.2)] whitespace-nowrap">
           Kingswood College Class of 2026
         </div>
 
