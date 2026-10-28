@@ -6,6 +6,7 @@ import SMSMatchPanel from '@/components/SMSMatchPanel';
 import ManualPaymentButton from '@/components/ManualPaymentButton';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import TicketAmountSelector from '@/components/TicketAmountSelector';
+import ExportAllZipButton from '@/components/ExportAllZipButton';
 
 const TABS = ['all', 'pending_review', 'suspicious', 'paid', 'not_paid'] as const;
 type Tab = typeof TABS[number];
@@ -56,9 +57,16 @@ export default async function PaymentsPage({
 
   return (
     <div className="max-w-6xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white">Payments</h1>
-        <p className="text-zinc-500 text-sm mt-1">Review receipts, run SMS matching, and verify payments.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Payments</h1>
+          <p className="text-zinc-500 text-sm mt-1">Review receipts, run SMS matching, and verify payments.</p>
+        </div>
+
+        {/* Download All Data & Slips Button */}
+        <div>
+          <ExportAllZipButton />
+        </div>
       </div>
 
       {/* SMS Match Panel */}

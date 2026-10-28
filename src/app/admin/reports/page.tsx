@@ -1,5 +1,6 @@
 import { createClient, createAdminClient } from '@/lib/supabase-server';
 import { FileText, Users, UserCheck, Clock, Download } from 'lucide-react';
+import ExportAllZipButton from '@/components/ExportAllZipButton';
 
 export default async function ReportsPage() {
   const supabase = await createClient();
@@ -31,21 +32,25 @@ export default async function ReportsPage() {
             <FileText size={20} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Entry Report</h1>
+            <h1 className="text-2xl font-bold text-white">Entry Report &amp; Data Export</h1>
             <p className="text-zinc-500 text-sm">
-              Real-time check-in log — Vanguard 2026
+              Real-time check-in log and full attendee backup — Vanguard 2026
             </p>
           </div>
         </div>
 
-        {/* Export Button */}
-        <a
-          href="/api/reports/export"
-          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#d4af37] text-black font-bold rounded-xl hover:bg-[#f0d060] transition-colors text-sm shadow-[0_0_15px_rgba(212,175,55,0.2)]"
-        >
-          <Download size={16} />
-          Export CSV Report
-        </a>
+        {/* Export Buttons */}
+        <div className="flex flex-wrap items-center gap-3">
+          <ExportAllZipButton />
+
+          <a
+            href="/api/reports/export"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#d4af37] text-black font-bold rounded-xl hover:bg-[#f0d060] transition-colors text-sm shadow-[0_0_15px_rgba(212,175,55,0.2)]"
+          >
+            <Download size={16} />
+            Export Check-in CSV
+          </a>
+        </div>
       </div>
 
       {/* Stats */}
@@ -103,8 +108,11 @@ export default async function ReportsPage() {
                   <th className="text-left px-6 py-3 text-zinc-500 text-xs font-medium uppercase tracking-wider">
                     Attendee
                   </th>
-                  <th className="text-left px-6 py-3 text-zinc-500 text-xs font-medium uppercase tracking-wider hidden sm:table-cell">
+                  <th className="text-left px-6 py-3 text-zinc-500 text-xs font-medium uppercase tracking-wider">
                     NIC
+                  </th>
+                  <th className="text-left px-6 py-3 text-zinc-500 text-xs font-medium uppercase tracking-wider hidden sm:table-cell">
+                    Phone
                   </th>
                   <th className="text-left px-6 py-3 text-zinc-500 text-xs font-medium uppercase tracking-wider">
                     Entry Time
@@ -115,16 +123,13 @@ export default async function ReportsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800">
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {checkedIn.map((a: any, index: number) => (
+                {checkedIn.map((a, i) => (
                   <tr
                     key={a.id}
-                    className="hover:bg-zinc-800/40 transition-colors"
+                    className="hover:bg-zinc-800/30 transition-colors"
                   >
-                    <td className="px-6 py-4">
-                      <span className="text-zinc-600 text-sm font-mono">
-                        {String(index + 1).padStart(3, '0')}
-                      </span>
+                    <td className="px-6 py-4 text-zinc-600 text-xs font-mono">
+                      {i + 1}
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-white text-sm font-medium">
@@ -132,42 +137,23 @@ export default async function ReportsPage() {
                       </div>
                       <div className="text-zinc-500 text-xs">{a.email}</div>
                     </td>
-                    <td className="px-6 py-4 hidden sm:table-cell">
-                      <span className="text-zinc-400 text-sm font-mono">
-                        {a.nic}
-                      </span>
+                    <td className="px-6 py-4 text-zinc-400 text-xs font-mono">
+                      {a.nic}
+                    </td>
+                    <td className="px-6 py-4 text-zinc-400 text-xs hidden sm:table-cell">
+                      {a.phone}
                     </td>
                     <td className="px-6 py-4">
-                      {a.qr_used_at ? (
-                        <div>
-                          <div className="text-white text-sm">
-                            {new Date(a.qr_used_at).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              second: '2-digit',
-                            })}
-                          </div>
-                          <div className="text-zinc-500 text-xs">
-                            {new Date(a.qr_used_at).toLocaleDateString()}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-zinc-600">—</span>
-                      )}
+                      <div className="text-green-400 text-xs font-medium">
+                        ✓ {a.qr_used_at ? new Date(a.qr_used_at).toLocaleTimeString() : '—'}
+                      </div>
+                      <div className="text-zinc-600 text-[10px]">
+                        {a.qr_used_at ? new Date(a.qr_used_at).toLocaleDateString() : ''}
+                      </div>
                     </td>
-                    <td className="px-6 py-4 hidden md:table-cell">
-                      {a.sentinel ? (
-                        <div>
-                          <div className="text-purple-300 text-sm font-medium">
-                            {a.sentinel.full_name}
-                          </div>
-                          <div className="text-zinc-600 text-xs">
-                            {a.sentinel.email}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-zinc-600 text-sm">—</span>
-                      )}
+                    <td className="px-6 py-4 text-zinc-400 text-xs hidden md:table-cell">
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {(a.sentinel as any)?.full_name || 'System / Admin'}
                     </td>
                   </tr>
                 ))}
@@ -175,12 +161,8 @@ export default async function ReportsPage() {
             </table>
           </div>
         ) : (
-          <div className="py-16 text-center">
-            <UserCheck size={36} className="text-zinc-700 mx-auto mb-3" />
-            <div className="text-zinc-400 font-medium">No entries yet</div>
-            <div className="text-zinc-600 text-sm mt-1">
-              Check-ins will appear here in real time
-            </div>
+          <div className="px-6 py-16 text-center text-zinc-600 text-sm">
+            No attendees checked in yet.
           </div>
         )}
       </div>
